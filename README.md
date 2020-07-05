@@ -33,13 +33,13 @@ Replace the values in `.env.example` with your own values and rename this file t
 | ------- | ------------------------------------------------------ |
 | v1      | working base flask app + lineplot graph and data table |
 
-## TODO
+### TODO
 
 - Function to upload CSV files, then have the graphs react dynamically to the new dataset.
 - More types of graphs and insights - waiting on my teammates for more ideas.
 - Endpoint to run image files through machine learning models.
 - Should come up with an actual name for this project and rename some of the folders.
 
-**FIXME**
+### FIXME
 
 - Dashboard loads very slowly even though the the dataset was pre-cleaned (`sensordata.csv`, 104727x35).
