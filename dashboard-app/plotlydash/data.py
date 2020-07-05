@@ -5,5 +5,5 @@ import numpy as np
 # TODO: TEMPORARY
 def create_dataframe():
     """Create Pandas DataFrame from local CSV."""
-    df = pd.read_csv("testdata/sensordata.csv")
+    df = pd.read_csv("data/sensordata.csv")
     return df

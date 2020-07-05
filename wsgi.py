@@ -1,5 +1,5 @@
 """Application entry point."""
-from flaskproject import create_app
+from dashboard-app import create_app
 
 app = create_app()
 

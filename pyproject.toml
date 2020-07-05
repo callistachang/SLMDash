@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "flaskproject"
+name = "dashboard-app"
 version = "0.1.0"
 description = ""
 authors = ["callistachang <changcallista@gmail.com>"]

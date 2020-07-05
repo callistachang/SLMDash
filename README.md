@@ -7,16 +7,16 @@ A visual dashboard to analyze CSV files produced by additive manufacturing senso
 Installation via Poetry:
 
 ```
-$ cd flaskproject
+$ cd dashboard-app
 $ poetry install
 $ poetry shell
 $ flask run
 ```
 
-Installation via `requirements.txt` (better to do this inside a virtual environment):
+Installation via `requirements.txt` (do this in a virtual environment):
 
 ```
-$ cd flaskproject
+$ cd dashboard-app
 $ pip install -r requirements.txt
 $ flask run
 ```
@@ -25,7 +25,7 @@ $ flask run
 
 Replace the values in `.env.example` with your own values and rename this file to `.env`.
 
-(Don't commit secrets saved in .env files to GitHub!!)
+(Don't commit secrets saved in .env files to GitHub.)
 
 ## Changelog
 
@@ -33,14 +33,13 @@ Replace the values in `.env.example` with your own values and rename this file t
 | ------- | ------------------------------------------------------ |
 | v1      | working base flask app + lineplot graph and data table |
 
-<!-- Working base Flask application.<br>Plotly Dash graph featuring a lineplot of over time. | -->
+## TODO
 
-**TODO**
-
-- Function to upload CSV files and have the graphs react dynamically to the new dataset.
+- Function to upload CSV files, then have the graphs react dynamically to the new dataset.
 - More types of graphs and insights - waiting on my teammates for more ideas.
 - Endpoint to run image files through machine learning models.
+- Should come up with an actual name for this project and rename some of the folders.
 
 **FIXME**
 
-- Dashboard loads very slowly even though the I pre-cleaned the dataset (`sensordata.csv`, 104727x35).
+- Dashboard loads very slowly even though the the dataset was pre-cleaned (`sensordata.csv`, 104727x35).
