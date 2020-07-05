@@ -1,5 +1,5 @@
 """Application entry point."""
-from dashboard-app import create_app
+from dashboard_app import create_app
 
 app = create_app()
 

@@ -7,7 +7,7 @@ A visual dashboard to analyze CSV files produced by additive manufacturing senso
 Installation via Poetry:
 
 ```
-$ cd dashboard-app
+$ cd dashboard_app
 $ poetry install
 $ poetry shell
 $ flask run
@@ -16,7 +16,7 @@ $ flask run
 Installation via `requirements.txt` (do this in a virtual environment):
 
 ```
-$ cd dashboard-app
+$ cd dashboard_app
 $ pip install -r requirements.txt
 $ flask run
 ```
