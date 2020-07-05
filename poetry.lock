@@ -89,6 +89,18 @@ dotenv = ["python-dotenv"]
 
 [[package]]
 category = "main"
+description = "Asset management for Flask, to compress and merge CSS and Javascript files."
+name = "flask-assets"
+optional = false
+python-versions = "*"
+version = "2.0"
+
+[package.dependencies]
+Flask = ">=0.8"
+webassets = ">=2.0"
+
+[[package]]
+category = "main"
 description = "Compress responses in your Flask app with gzip or brotli."
 name = "flask-compress"
 optional = false
@@ -224,6 +236,14 @@ version = "1.15.0"
 
 [[package]]
 category = "main"
+description = "Media asset management for Python, with glue code for various web frameworks"
+name = "webassets"
+optional = false
+python-versions = "*"
+version = "2.0"
+
+[[package]]
+category = "main"
 description = "The comprehensive WSGI web application library."
 name = "werkzeug"
 optional = false
@@ -235,7 +255,7 @@ dev = ["pytest", "pytest-timeout", "coverage", "tox", "sphinx", "pallets-sphinx-
 watchdog = ["watchdog"]
 
 [metadata]
-content-hash = "84b91a5799ab91b7d0d740a274176bf8d909b32d88c80a50be73998f778e1821"
+content-hash = "554c737f8521ab8607f432b112ee6630c74d0499a80e0ea04a1d16a624a783a1"
 python-versions = "^3.6.1"
 
 [metadata.files]
@@ -296,6 +316,10 @@ dash-table = [
 flask = [
     {file = "Flask-1.1.2-py2.py3-none-any.whl", hash = "sha256:8a4fdd8936eba2512e9c85df320a37e694c93945b33ef33c89946a340a238557"},
     {file = "Flask-1.1.2.tar.gz", hash = "sha256:4efa1ae2d7c9865af48986de8aeb8504bf32c7f3d6fdc9353d34b21f4b127060"},
+]
+flask-assets = [
+    {file = "Flask-Assets-2.0.tar.gz", hash = "sha256:1dfdea35e40744d46aada72831f7613d67bf38e8b20ccaaa9e91fdc37aa3b8c2"},
+    {file = "Flask_Assets-2.0-py3-none-any.whl", hash = "sha256:2845bd3b479be9db8556801e7ebc2746ce2d9edb4e7b64a1c786ecbfc1e5867b"},
 ]
 flask-compress = [
     {file = "Flask-Compress-1.5.0.tar.gz", hash = "sha256:f367b2b46003dd62be34f7fb1379938032656dca56377a9bc90e7188e4289a7c"},
@@ -414,6 +438,10 @@ retrying = [
 six = [
     {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},
     {file = "six-1.15.0.tar.gz", hash = "sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"},
+]
+webassets = [
+    {file = "webassets-2.0-py3-none-any.whl", hash = "sha256:a31a55147752ba1b3dc07dee0ad8c8efff274464e08bbdb88c1fd59ffd552724"},
+    {file = "webassets-2.0.tar.gz", hash = "sha256:167132337677c8cedc9705090f6d48da3fb262c8e0b2773b29f3352f050181cd"},
 ]
 werkzeug = [
     {file = "Werkzeug-1.0.1-py2.py3-none-any.whl", hash = "sha256:2de2a5db0baeae7b2d2664949077c2ac63fbd16d98da0ff71837f7d1dea3fd43"},
