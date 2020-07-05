@@ -35,11 +35,17 @@ Replace the values in `.env.example` with your own values and rename this file t
 
 ### TODO
 
-- Function to upload CSV files, then have the graphs react dynamically to the new dataset.
-- More types of graphs and insights - waiting on my teammates for more ideas.
-- Endpoint to run image files through machine learning models.
-- Should come up with an actual name for this project and rename some of the folders.
+| Todo                                            | Status                                |
+| ----------------------------------------------- | ------------------------------------- |
+| base flask app                                  | :heavy_check_mark:                    |
+| base plotly dash integration                    | :heavy_check_mark:                    |
+| able to upload csv data; graphs respond to them | high priority                         |
+| more graphs and insights                        | medium priority; waiting on teammates |
+| interactive dropdown options in plotly          | medium priority                       |
+| new endpoint for ML functionality               | low priority                          |
 
 ### FIXME
 
-- Dashboard loads very slowly even though the the dataset was pre-cleaned (`sensordata.csv`, 104727x35).
+| Fixme                                                                                         | Potential Fixes                                                   | Status          |
+| --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- | --------------- |
+| dashboard loads slowly even though dataset (`data/sensordata.csv`, 104727x35) was pre-cleaned | - 'paginate' the graph and show only X number of points at one go | medium priority |
