@@ -12,7 +12,7 @@ html_layout = """
         <body class="dash-template">
             <header>
                 <div class="nav-wrapper">
-                    <h1>Dashboard</h1>
+                    <h2 style="padding-left:10px; text-align:center">Dashboard</h2>
                 </div>
             </header>
             {%app_entry%}

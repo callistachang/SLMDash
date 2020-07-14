@@ -20,14 +20,14 @@ def pressure_and_oxygen_over_time(df):
             'line': {
                 'color': color1
             },
-            'type': 'scatter'
+            'type': 'scattergl'
         },
         {
             'x': df['Time'],
             'y': df['Oxygen top'],
             'name': 'oxygen',
             'yaxis': 'y2',
-            'type': 'scatter'
+            'type': 'scattergl'
         }
     ]
 
@@ -53,9 +53,8 @@ def pressure_and_oxygen_over_time(df):
                 'color': color2
             }
         },
-        'height': 500,
-        'width': 1000,
-        'padding': 100,
+        'height': '50%',
+        'width': '50%',
     }
 
     return {'data': data, 'layout': layout}
@@ -78,10 +77,10 @@ def create_dashboard(server):
     # Create Layout
     dash_app.layout = html.Div(children=[
         dcc.Graph(
-            id='example-graph',
+            id='graph-1',
             figure=pressure_and_oxygen_over_time(df)
         ),
-        create_data_table(df)
+        # create_data_table(df)
     ])
 
     return dash_app.server
