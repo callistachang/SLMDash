@@ -7,6 +7,7 @@ A visual dashboard to analyze CSV files produced by additive manufacturing senso
 | Version | Features                                               |
 | ------- | ------------------------------------------------------ |
 | v1      | working base flask app + lineplot graph and data table |
+| v2      | upload csv functionality + fixed slow loading          |
 
 See the list of issues [here](https://github.com/callistachang/dashboard-app/issues).
 
@@ -15,7 +16,7 @@ See the list of issues [here](https://github.com/callistachang/dashboard-app/iss
 Installation via Poetry:
 
 ```
-$ cd dashboard_app
+$ cd dashboard-app
 $ poetry install
 $ poetry shell
 $ flask run
@@ -24,11 +25,11 @@ $ flask run
 Installation via `requirements.txt` (do this in a virtual environment):
 
 ```
-$ cd dashboard_app
+$ cd dashboard-app
 $ pip install -r requirements.txt
 $ flask run
 ```
 
 ## Usage
 
-Replace the values in `.env.example` with your own values and rename this file to `.env`. Don't commit secrets to GitHub.
+Replace the values in `.env.example` with your own values and rename this file to `.env`.
