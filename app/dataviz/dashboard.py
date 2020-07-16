@@ -54,12 +54,13 @@ def create_layout():
                 'alignItems': 'center',
             }
         ),
-        dcc.Graph(
-            id='example-graph',
-            figure=graphs.pressure_and_oxygen_over_time(df)
-        ),
         html.Div(id='upload-output')
     ])
+
+def create_graphs(df):
+    return [
+        dcc.Graph(figure=graphs.pressure_and_oxygen_over_time(df)),
+    ]
 
 def init_callbacks(app):
     @app.callback(
@@ -68,8 +69,10 @@ def init_callbacks(app):
          Input('upload-input', 'filename')]
     )
     def update_output(list_of_contents, list_of_names):
-        print("Updating...")
-        if list_of_names is not None:
-            print(list_of_names)
+        print('Updating...')
+        if list_of_names:
             df = parse_data_sheet(list_of_contents, list_of_names)
-            print(df.head())
+            if df is not None:
+                return create_graphs(df)
+            else:
+                return html.Div(children=['The file you uploaded was either not a CSV file or does not have the expected column names.'])

@@ -35,15 +35,14 @@ def parse_data_sheet(content, filename):
 
     try:
         if 'csv' in filename[-3:]:
-            df = pd.read_csv(io.StringIO(decoded_data.decode('utf-8')), delimiter=";")
+            df = pd.read_csv(io.StringIO(decoded_data.decode('utf-8')), delimiter=";", parse_dates=['Time'])
             if all(df.columns == column_names):
-                print('File loaded successfully!')
+                print('File loaded successfully')
                 return df
 
     except Exception as e:
         print(e)
 
-    print('The file you uploaded was either not a CSV file or does not have the expected column names.')
     return None
 
 
