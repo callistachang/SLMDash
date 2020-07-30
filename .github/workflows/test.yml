@@ -1,0 +1,64 @@
+name: Run Tests
+
+# triggers the workflow upon push/pull request to the master branch
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+# running 1 job with sequential steps called 'test'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.6
+
+      - name: Install Poetry
+        uses: dschep/install-poetry-action@v1.3
+        with:
+          create_virtualenvs: true
+
+      - name: Cache Poetry
+        uses: actions/cache@v1
+        id: cache
+        with:
+          path: ~/.virtualenvs
+          key: poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: poetry-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Set up Poetry configuration
+        run: |
+          poetry config virtualenvs.in-project false
+          poetry config virtualenvs.path ~/.virtualenvs
+
+      - name: Install dependencies
+        run: poetry install
+        if: steps.cache.outputs.cache-hit != 'true'
+
+      # - name: Ensure code quality using Black
+      #   run: poetry run black . --check
+
+      - name: Test application
+        run: poetry run python -m pytest
+
+      - name: Alert test success on Discord
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: success()
+        with:
+          severity: info
+          details: Tests succeeded.
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+
+      - name: Alert test failure on Discord
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: failure()
+        with:
+          severity: error
+          details: Tests failed.
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}

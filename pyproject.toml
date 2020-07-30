@@ -13,6 +13,8 @@ python-dotenv = "^0.14.0"
 flask_assets = "^2.0"
 
 [tool.poetry.dev-dependencies]
+black = "^19.10b0"
+pytest = "^6.0.0"
 
 [build-system]
 requires = ["poetry>=0.12"]

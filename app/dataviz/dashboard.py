@@ -12,13 +12,14 @@ from .layout import html_layout
 from . import graphs
 from .utils import create_placeholder_df, parse_data_sheet
 
+
 def create_dashboard(server):
     """Create a Plotly Dash dashboard."""
 
     dash_app = dash.Dash(
         server=server,
-        routes_pathname_prefix='/dataviz/',
-        external_stylesheets=['https://codepen.io/chriddyp/pen/bWLwgP.css']
+        routes_pathname_prefix="/dataviz/",
+        external_stylesheets=["https://codepen.io/chriddyp/pen/bWLwgP.css"],
     )
 
     # Custom HTML layout
@@ -31,48 +32,53 @@ def create_dashboard(server):
 
     return dash_app.server
 
+
 def create_layout():
     """Create the dashboard layout."""
-    
+
     df = create_placeholder_df()
 
-    return html.Div([
-        dcc.Upload(
-            id='upload-input',
-            children=html.Div([
-                'Drag and Drop or ',
-                html.A('Select File')
-            ]),
-            style={
-                'width': '80%',
-                'height': '60px',
-                'lineHeight': '60px',
-                'border': '1px dashed',
-                'borderRadius': '5px',
-                'textAlign': 'center',
-                'margin': '10px',
-                'alignItems': 'center',
-            }
-        ),
-        html.Div(id='upload-output')
-    ])
+    return html.Div(
+        [
+            dcc.Upload(
+                id="upload-input",
+                children=html.Div(["Drag and Drop or ", html.A("Select File")]),
+                style={
+                    "width": "80%",
+                    "height": "60px",
+                    "lineHeight": "60px",
+                    "border": "1px dashed",
+                    "borderRadius": "5px",
+                    "textAlign": "center",
+                    "margin": "10px",
+                    "alignItems": "center",
+                },
+            ),
+            html.Div(id="upload-output"),
+        ]
+    )
+
 
 def create_graphs(df):
     return [
         dcc.Graph(figure=graphs.pressure_and_oxygen_over_time(df)),
     ]
 
+
 def init_callbacks(app):
     @app.callback(
-        Output('upload-output', 'children'),
-        [Input('upload-input', 'contents'),
-         Input('upload-input', 'filename')]
+        Output("upload-output", "children"),
+        [Input("upload-input", "contents"), Input("upload-input", "filename")],
     )
     def update_output(list_of_contents, list_of_names):
-        print('Updating...')
+        print("Updating...")
         if list_of_names:
             df = parse_data_sheet(list_of_contents, list_of_names)
             if df is not None:
                 return create_graphs(df)
             else:
-                return html.Div(children=['The file you uploaded was either not a CSV file or does not have the expected column names.'])
+                return html.Div(
+                    children=[
+                        "The file you uploaded was either not a CSV file or does not have the expected column names."
+                    ]
+                )
