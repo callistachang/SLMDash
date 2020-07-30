@@ -65,14 +65,16 @@ def parse_data_sheet(content, filename):
     decoded_data = base64.b64decode(content_string)
 
     try:
-        if 'csv' in filename[-3:]:
+        if "csv" in filename[-3:]:
             # improved from 56s to 12.6s to 0.8s :D
             df = pd.read_csv(
-                io.StringIO(decoded_data.decode('utf-8')), 
-                delimiter=";", 
-                parse_dates=['Time'], 
-                date_parser=lambda dt: pd.to_datetime(dt, format='%a %b %d %H:%M:%S %Y'),
-                cache_dates=False
+                io.StringIO(decoded_data.decode("utf-8")),
+                delimiter=";",
+                parse_dates=["Time"],
+                date_parser=lambda dt: pd.to_datetime(
+                    dt, format="%a %b %d %H:%M:%S %Y"
+                ),
+                cache_dates=False,
             )
             if all(df.columns == column_names):
                 print("File loaded successfully")
