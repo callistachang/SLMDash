@@ -45,20 +45,20 @@ jobs:
         run: poetry run black . --check
 
       - name: Test application
-        run: poetry run pytest
+        run: poetry run python -m pytest
 
       - name: Alert test success on Discord
-        uses: rjstone/discord-webhook-notify@v1
+        uses: rjstone/discord-webhook-notify@v1.0.4
         if: success()
         with:
           severity: info
-          details: Test succeeded.
+          details: Tests succeeded.
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
 
       - name: Alert test failure on Discord
-        uses: rjstone/discord-webhook-notify@v1
+        uses: rjstone/discord-webhook-notify@v1.0.4
         if: failure()
         with:
           severity: error
-          details: Test failed.
+          details: Tests failed.
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
