@@ -7,8 +7,8 @@ on:
   pull_request:
     branches: [master]
 
+# running 1 job with sequential steps called 'test'
 jobs:
-  # a job called 'test'
   test:
     runs-on: ubuntu-latest
     steps:
@@ -49,14 +49,14 @@ jobs:
         uses: rjstone/discord-webhook-notify@v1
         if: success()
         with:
-            severity: info
-            details: Test succeeded.
-            webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          severity: info
+          details: Test succeeded.
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
 
       - name: Alert test failure
-          uses: rjstone/discord-webhook-notify@v1
-          if: failure()
-          with:
-              severity: error
-              details: Test failed.
-              webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: rjstone/discord-webhook-notify@v1
+        if: failure()
+        with:
+          severity: error
+          details: Test failed.
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
