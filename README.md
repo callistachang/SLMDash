@@ -25,7 +25,7 @@ $ flask run
 
 Replace the values in `.env.example` with your own values and rename this file to `.env`.
 
-Run `poetry run black .` before committing to the repo to standardize the code formatting.
+Run `black .` before committing to the repo to standardize code formatting.
 
 ## Changelog
 
