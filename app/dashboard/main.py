@@ -15,7 +15,7 @@ from .utils import parse_data_sheet
 def create_dashboard(server):
     dash_app = dash.Dash(
         server=server,
-        routes_pathname_prefix="/dashboard/",
+        routes_pathname_prefix="/data-dashboard/",
         external_stylesheets=["https://codepen.io/chriddyp/pen/bWLwgP.css"],
     )
 

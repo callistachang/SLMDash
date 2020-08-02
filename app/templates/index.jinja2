@@ -1,12 +1,45 @@
 {% extends "layout.jinja2" %}
 
 {% block content %}
-<div class="card">
-  {# <img src="{{ url_for('static', filename='img/logo.png') }}" class="logo" /> #}
-  <h1 class="site-title">{{ title }}</h1>
-  <a href="/dataviz/" class="dash-link">
-    <span>Embdedded Plotly Dash</span>
-    <i class="fas fa-arrow-right"></i>
-  </a>
+<h1 class="site-title text-center py-3">{{ title }}</h1>
+
+<div class="mx-5">
+  <div class="card-group text-center">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Interactive Data Visualization Dashboard</h5>
+        <h6 class="card-subtitle mb-2 text-muted">Built with Plotly Dash</h6>
+        <p class="card-text">Upload a CSV file using sensor data to dynamically generate graphs.</p>
+        <a href="/data-dashboard/" class="btn btn-primary">Go to Dashboard</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Interactive CNN Dashboard</h5>
+        <h6 class="card-subtitle mb-2 text-muted">WIP</h6>
+        <p class="card-text">Upload an sensor image and determine if the sensor is faulty or not.</p>
+        <a href="/ml-dashboard/" class="btn btn-secondary">Go to Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-group text-center">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Data Analysis Report</h5>
+        <h6 class="card-subtitle mb-2 text-muted">WIP</h6>
+        <p class="card-text">Our findings for data analysis thus far.</p>
+        <a href="/data-report/" class="btn btn-secondary">Go to Report</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Machine Learning Report</h5>
+        <h6 class="card-subtitle mb-2 text-muted">WIP</h6>
+        <p class="card-text">Our personal research on machine learning and CNNs thus far.</p>
+        <a href="/ml-report/" class="btn btn-secondary">Go to Report</a>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

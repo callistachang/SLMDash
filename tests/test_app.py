@@ -3,8 +3,13 @@ def test_index_page(app, client):
     assert res.status_code == 200
 
 
-def test_dashboard_page(app, client):
-    res = client.get("/dashboard/")
+def test_data_dashboard_page(app, client):
+    res = client.get("/data-dashboard/")
+    assert res.status_code == 200
+
+
+def test_ml_dashboard_page(app, client):
+    res = client.get("/ml-dashboard/")
     assert res.status_code == 200
 
 
