@@ -3,16 +3,20 @@ html_layout = """
         <head>
             {%metas%}
             <title>{%title%}</title>
-            {%favicon%}
             {%css%}
         </head>
-        <body class="dash-template">
+
+        <body>
+            <nav class="navbar navbar-dark bg-primary">
+                <a href="/"><i class="fa fa-home fa-lg" style="color: white;"></i></a>
+                <span class="navbar-brand my-0 mx-auto h1">Dashboard App</span>
+            </nav>
             <header>
-                <div class="nav-wrapper">
-                    <h2 style="padding-left:10px; text-align:center">Dashboard</h2>
-                </div>
+                <h2 class="text-center py-3">Data Visualization Dashboard</h1>
             </header>
+
             {%app_entry%}
+            
             <footer>
                 {%config%}
                 {%scripts%}

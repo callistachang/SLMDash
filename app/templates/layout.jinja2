@@ -13,7 +13,14 @@
 </head>
 
 <body class="{{ template }}">
+  <nav class="navbar navbar-dark bg-primary">
+    <a href="/">
+      <i class="fa fa-home fa-lg" style="color: white;"></i>
+    </a>
+    <span class="navbar-brand my-0 mx-auto h1">Dashboard App</span>
+  </nav>
   <div class="container-fluid">
+    <h2 class="text-center py-3">{{ title }}</h1>
 	  {% block content %}{% endblock %}
   </div>
 </body>

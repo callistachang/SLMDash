@@ -16,7 +16,10 @@ def create_dashboard(server):
     dash_app = dash.Dash(
         server=server,
         routes_pathname_prefix="/data-dashboard/",
-        external_stylesheets=["https://codepen.io/chriddyp/pen/bWLwgP.css"],
+        external_stylesheets=[
+            "https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css",
+            "https://use.fontawesome.com/releases/v5.8.1/css/all.css",
+        ],
     )
 
     # Custom HTML layout
@@ -34,8 +37,9 @@ def create_layout():
     return html.Div(
         [
             dcc.Upload(
-                id="upload-input",
+                id="upload-component",
                 children=html.Div(["Drag and Drop or ", html.A("Select File")]),
+                className="text-center",
                 style={
                     "width": "80%",
                     "height": "60px",
@@ -47,7 +51,7 @@ def create_layout():
                     "alignItems": "center",
                 },
             ),
-            html.Div(id="upload-output"),
+            html.Div(id="dynamically-generated-graphs"),
         ]
     )
 
@@ -60,13 +64,13 @@ def create_graphs(df):
 
 def init_callbacks(app):
     @app.callback(
-        Output("upload-output", "children"),
-        [Input("upload-input", "contents"), Input("upload-input", "filename")],
+        Output("dynamically-generated-graphs", "children"),
+        [Input("upload-component", "contents"), Input("upload-component", "filename")],
     )
-    def update_output(list_of_contents, list_of_names):
+    def update_output(content, filename):
         print("Updating...")
-        if list_of_names:
-            df = parse_data_sheet(list_of_contents, list_of_names)
+        if filename:
+            df = parse_data_sheet(content, filename)
             if df is not None:
                 return create_graphs(df)
             else:
