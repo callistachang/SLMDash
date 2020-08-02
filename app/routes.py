@@ -5,8 +5,6 @@ from flask import current_app as app
 
 @app.route("/")
 def home():
-    """Landing page."""
-
     return render_template(
-        "index.jinja2", title="MVP Dashboard", template="home-template",
+        "index.jinja2", title="WIP Dashboard", template="home-template",
     )

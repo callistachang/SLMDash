@@ -84,7 +84,3 @@ def parse_data_sheet(content, filename):
         print(e)
 
     return None
-
-
-def create_placeholder_df():
-    return pd.read_csv("data/sensordata.csv")

@@ -1,4 +1,3 @@
-"""Instantiate a Dash app."""
 import numpy as np
 import pandas as pd
 import datetime
@@ -10,15 +9,13 @@ import dash_core_components as dcc
 
 from .layout import html_layout
 from . import graphs
-from .utils import create_placeholder_df, parse_data_sheet
+from .utils import parse_data_sheet
 
 
 def create_dashboard(server):
-    """Create a Plotly Dash dashboard."""
-
     dash_app = dash.Dash(
         server=server,
-        routes_pathname_prefix="/dataviz/",
+        routes_pathname_prefix="/dashboard/",
         external_stylesheets=["https://codepen.io/chriddyp/pen/bWLwgP.css"],
     )
 
@@ -34,10 +31,6 @@ def create_dashboard(server):
 
 
 def create_layout():
-    """Create the dashboard layout."""
-
-    df = create_placeholder_df()
-
     return html.Div(
         [
             dcc.Upload(

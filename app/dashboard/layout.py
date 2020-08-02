@@ -1,5 +1,3 @@
-"""Plotly Dash HTML layout override."""
-
 html_layout = """
     <html>
         <head>
