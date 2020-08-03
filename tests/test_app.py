@@ -3,11 +3,6 @@ def test_index_page(app, client):
     assert res.status_code == 200
 
 
-<<<<<<< Updated upstream
-def test_dataviz_page(app, client):
-    res = client.get("/dataviz/")
-    assert res.status_code == 200
-=======
 def test_data_dashboard_page(app, client):
     res = client.get("/data-dashboard/")
     assert res.status_code == 200
@@ -26,4 +21,3 @@ def test_data_dashboard_page(app, client):
 # def test_ml_report_page(app, client):
 #     res = client.get("/ml-report")
 #     assert res.status_code == 200
->>>>>>> Stashed changes

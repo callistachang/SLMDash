@@ -35,3 +35,10 @@ Run `black .` before committing to the repo to standardize code formatting.
 | v2      | upload csv functionality + fixed slow loading          |
 
 See the list of issues [here](https://github.com/callistachang/dashboard-app/issues).
+
+## Contributing Members
+
+- Callista Rossary Chang
+- Wang Yi
+- Swati Shet
+- Xiao Yang
