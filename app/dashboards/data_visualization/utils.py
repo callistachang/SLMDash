@@ -7,43 +7,7 @@ import io
 import dash_table
 import dash_html_components as html
 
-column_names = [
-    "Time",
-    "Pressure",
-    "Filter Status",
-    "Gas flow speed",
-    "Gas pump power",
-    "Oxygen top",
-    "Oxygen 2",
-    "Gas Temp",
-    "Platform",
-    "Build Chamber",
-    "Optical Bench",
-    "Collimator",
-    "T_U",
-    "T_LL",
-    "T_LR",
-    "R_LL",
-    "R_LR",
-    "B_F",
-    "B_R",
-    "Pump",
-    "Cabinet",
-    "Cabinet 2",
-    "Ambiance",
-    "MemTotal",
-    "MemProcess",
-    "Laser Emission Flags",
-    "Laser On Flags",
-    "Galvo X0",
-    "Galvo Y0",
-    "Servo X0",
-    "Servo Y0",
-    "Optic1 Home-in X1",
-    "Optic1 Home-in Y1",
-    "Optic1 Home-in X2",
-    "Optic1 Home-in Y2",
-]
+from .constants import slm280_columns, slm500_columns
 
 
 def create_data_table(df):
@@ -61,6 +25,15 @@ def create_data_table(df):
 
 
 def parse_data_sheet(content, filename):
+    """[summary]
+
+    Args:
+        content (string): [description]
+        filename (string): Name of the CSV file uploaded on the dataviz dashboard
+
+    Returns:
+        DataFrame: Clean pandas DF.
+    """
     _, content_string = content.split(",")
     decoded_data = base64.b64decode(content_string)
 
@@ -76,11 +49,19 @@ def parse_data_sheet(content, filename):
                 ),
                 cache_dates=False,
             )
-            if all(df.columns == column_names):
-                print("File loaded successfully")
+            if all(df.columns == slm500_columns) or all(df.columns == slm500_columns):
+                print("File loaded successfully!")
                 return df
 
     except Exception as e:
         print(e)
 
     return None
+
+
+def clean_slm280_data(df):
+    pass
+
+
+def clean_slm500_data(df):
+    pass
