@@ -35,31 +35,35 @@ def create_dashboard(server):
 
 def create_layout():
     return html.Div(
-        [
+        children=[
             dcc.Upload(
                 id="upload-component",
-                children=html.Div(["Drag and Drop or ", html.A("Select File")]),
-                className="text-center",
+                children=html.Div(
+                    [
+                        "Drag and Drop or ",
+                        html.A("Select File", style={"textDecoration": "underline"},),
+                    ]
+                ),
+                className="mx-auto w-50 text-center rounded",
                 style={
-                    "width": "80%",
-                    "height": "60px",
                     "lineHeight": "60px",
                     "border": "1px dashed",
-                    "borderRadius": "5px",
-                    "textAlign": "center",
-                    "margin": "10px",
-                    "alignItems": "center",
+                    "cursor": "pointer",
                 },
             ),
-            html.Div(id="dynamically-generated-graphs"),
-        ]
+            html.Div(id="dynamically-generated-graphs", className="text-center py-4"),
+        ],
+        className="container-fluid",
     )
 
 
 def create_graphs(df):
-    return [
-        dcc.Graph(figure=graphs.pressure_and_oxygen_over_time(df)),
-    ]
+    return html.Div(
+        children=[
+            dcc.Graph(figure=graphs.pressure_and_oxygen_over_time(df), className="col"),
+        ],
+        className="row",
+    )
 
 
 def init_callbacks(app):
@@ -72,7 +76,10 @@ def init_callbacks(app):
         if filename:
             df = parse_data_sheet(content, filename)
             if df is not None:
-                return create_graphs(df)
+                return [
+                    html.P(f"Successfully uploaded: {filename} ✓"),
+                    create_graphs(df),
+                ]
             else:
                 return html.Div(
                     children=[

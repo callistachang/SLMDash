@@ -33,9 +33,6 @@ def pressure_and_oxygen_over_time(df):
             "titlefont": {"color": color2},
             "tickfont": {"color": color2},
         },
-        "height": 500,
-        "width": 1000,
-        "padding": 100,
     }
 
     return {"data": data, "layout": layout}

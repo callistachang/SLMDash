@@ -4,6 +4,7 @@ html_layout = """
             {%metas%}
             <title>{%title%}</title>
             {%css%}
+            {%favicon%}
         </head>
 
         <body>
@@ -11,8 +12,9 @@ html_layout = """
                 <a href="/"><i class="fa fa-home fa-lg" style="color: white;"></i></a>
                 <span class="navbar-brand my-0 mx-auto h1">Dashboard App</span>
             </nav>
-            <header>
-                <h2 class="text-center py-3">Data Visualization Dashboard</h1>
+            <header class="text-center py-3">
+                <h2>Data Visualization Dashboard</h2>
+                <i>TODO: Now that functionality is stable, we will be adding more graphs and interactivity.</i>
             </header>
 
             {%app_entry%}
