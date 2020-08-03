@@ -1,4 +1,4 @@
-{% extends "layout.jinja2" %}
+{% extends "base.jinja2" %}
 
 {% block content %}
 
@@ -23,14 +23,6 @@
             <span>Sensor Data Analysis</span>
             <i class="fa fa-angle-double-right fa-xs"></i>
             <a href="https://colab.research.google.com/drive/1m2BvtiiLbee9nIVdmaFmDK6MTbx0XJLc">
-                <img src="{{url_for('static', filename='images/colab-badge.svg')}}" alt="Open in Colab"/>
-            </a>
-        </li>
-
-        <li>
-            <span>Correlation Maps</span>
-            <i class="fa fa-angle-double-right fa-xs"></i>
-            <a href="https://colab.research.google.com/drive/18ktogW0jZMF2A0tEKS7XF5pALfMRBFVD">
                 <img src="{{url_for('static', filename='images/colab-badge.svg')}}" alt="Open in Colab"/>
             </a>
         </li>

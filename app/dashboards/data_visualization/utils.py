@@ -25,14 +25,14 @@ def create_data_table(df):
 
 
 def parse_data_sheet(content, filename):
-    """[summary]
+    """Convert the uploaded CSV file from the data dashboard to a Pandas DataFrame.
 
     Args:
-        content (string): [description]
-        filename (string): Name of the CSV file uploaded on the dataviz dashboard
+        content (string): Base64-encoded, comma-separated string of values from the CSV file.
+        filename (string): Name of the CSV file uploaded.
 
     Returns:
-        DataFrame: Clean pandas DF.
+        DataFrame: The Pandas DataFrame which has also been cleaned.
     """
     _, content_string = content.split(",")
     decoded_data = base64.b64decode(content_string)

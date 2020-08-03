@@ -29,10 +29,11 @@ Run `black .` before committing to the repo to standardize code formatting.
 
 ## Changelog
 
-| Version | Features                                               |
-| ------- | ------------------------------------------------------ |
-| v1      | working base flask app + lineplot graph and data table |
-| v2      | upload csv functionality + fixed slow loading          |
+| Version | Features                                                            |
+| ------- | ------------------------------------------------------------------- |
+| v1      | working flask app + static data dashboard                           |
+| v2      | upload csv functionality on the data dashboard + fixed slow loading |
+| v3      | index page + skeletons for each of the 4 sections                   |
 
 See the list of issues [here](https://github.com/callistachang/dashboard-app/issues).
 
