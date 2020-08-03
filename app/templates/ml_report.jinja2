@@ -1,0 +1,30 @@
+{% extends "layout.jinja2" %}
+
+{% block content %}
+
+<style>
+.report-section {
+    margin: 1em 0.5em;
+}
+</style>
+
+<div class="report-section">
+    <h4>Jupyter Notebooks</h4>
+    <ol>
+        <li>
+            <span>LSTM Network with Keras</span>
+            <i class="fa fa-angle-double-right fa-xs"></i>
+            <a href="https://colab.research.google.com/drive/1R2mkXq5DmrAIb1kudjHTr4DMpOhb4oxD">
+                <img src="{{url_for('static', filename='images/colab-badge.svg')}}" alt="Open in Colab"/>
+            </a>
+            <p><i>We will be using a Long Short Term Memory neural network to predict oxygen levels for the next day and send a warning if it rises above the threshold.</i></p>
+        </li>
+    </ol>
+</div>
+
+<div class="report-section">
+    <h4>Writeup</h4>
+    <i>WIP</i>
+</div>
+
+{% endblock %}

@@ -14,7 +14,7 @@ html_layout = """
             </nav>
             <header class="text-center py-3">
                 <h2>Data Visualization Dashboard</h2>
-                <i>TODO: Now that functionality is stable, we will be adding more graphs and interactivity.</i>
+                <i>TODO: We will be adding more graphs and interactivity in the future.</i>
             </header>
 
             {%app_entry%}

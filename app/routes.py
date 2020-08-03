@@ -19,7 +19,7 @@ def data_report():
 
 @app.route("/ml-report")
 def ml_report():
-    return render_template("wip.jinja2", title="Machine Learning Report")
+    return render_template("ml_report.jinja2", title="Machine Learning Report")
 
 
 # /data-dashboard was implicitly routed in main.py

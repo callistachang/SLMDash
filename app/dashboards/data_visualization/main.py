@@ -77,7 +77,7 @@ def init_callbacks(app):
             df = parse_data_sheet(content, filename)
             if df is not None:
                 return [
-                    html.P(f"Successfully uploaded: {filename} ✓"),
+                    html.P(f"Successfully uploaded: {filename} ✓", className="text-success"),
                     create_graphs(df),
                 ]
             else:
