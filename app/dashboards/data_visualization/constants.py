@@ -1,6 +1,3 @@
-color1 = "#9467BD"
-color2 = "#F08B00"
-
 slm280_columns = [
     "Time",
     "Platform",
@@ -81,4 +78,42 @@ slm500_columns = [
     "Optic1 Home-in Y1",
     "Optic1 Home-in X2",
     "Optic1 Home-in Y2",
+]
+
+column_mapper = {
+    "Gas Temp": "GasTemp",
+    "Gas flow speed": "GasFlowSpeed",
+    "Build Chamber": "BuildChamber",
+    "Filter Status": "FilterStatus",
+    "Pump1": "Pump",
+    "Cabinet": "Cabinet1",
+    "Cabinet 2": "Cabinet2",
+    "Optical Bench": "OpticalBench",
+    "Oxygen top": "Oxygen1",
+    "Oxygen 1": "Oxygen1",
+    "Oxygen 2": "Oxygen2",
+    "Laser Emission Flags": "LaserEmissionFlags",
+    "Laser On Flags": "LaserOnFlags",
+}
+
+columns_to_keep = [
+    "Time",
+    "Pressure",
+    "GasTemp",
+    "GasFlowSpeed",
+    "BuildChamber",
+    "Pump",
+    "FilterStatus",
+    "Platform",
+    "Cabinet1",
+    "Cabinet2",
+    "OpticalBench",
+    "Collimator",
+    "Ambiance",
+    "Oxygen1",
+    "Oxygen2",
+    "MemTotal",
+    "MemProcess",
+    "LaserEmissionFlags",
+    "LaserOnFlags",
 ]

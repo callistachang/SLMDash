@@ -7,12 +7,76 @@ import io
 import dash_table
 import dash_html_components as html
 
-from .constants import slm280_columns, slm500_columns
+from . import constants
+
+
+def parse_data_sheet(content, filename):
+    """Convert the CSV file uploaded from the data dashboard to a Pandas DataFrame.
+
+    Args:
+        content (string): Base64-encoded, comma-separated string of values from the CSV file.
+        filename (string): Name of the CSV file uploaded.
+
+    Returns:
+        Dictionary: Contains the cleaned Pandas DataFrame and the machine type derived from the CSV file.
+    """
+    _, content_string = content.split(",")
+    decoded_data = base64.b64decode(content_string)
+
+    try:
+        if "csv" in filename[-3:]:
+            df_columns = pd.read_csv(
+                io.StringIO(decoded_data.decode("utf-8")), nrows=1, delimiter=";"
+            ).columns
+            print(df_columns)
+            datetime_format = ""
+            machine_type = ""
+
+            if len(df_columns) == len(constants.slm280_columns) and all(
+                df_columns == constants.slm280_columns
+            ):
+                machine_type = "SLM280"
+                datetime_format = "%m/%d/%y %H:%M:%S"
+            elif len(df_columns) == len(constants.slm500_columns) and all(
+                df_columns == constants.slm500_columns
+            ):
+                machine_type = "SLM500"
+                datetime_format = "%a %b %d %H:%M:%S %Y"
+
+            # improved from 56s to 12.6s to 0.8s :D
+            df = pd.read_csv(
+                io.StringIO(decoded_data.decode("utf-8")),
+                delimiter=";",
+                parse_dates=["Time"],
+                date_parser=lambda dt: pd.to_datetime(
+                    dt, format=datetime_format, errors="coerce"
+                ),
+                cache_dates=False,
+            )
+
+            return {"cleaned_df": clean_dataframe(df), "machine_type": machine_type}
+
+    except Exception as e:
+        print(e)
+
+    return None
+
+
+def clean_dataframe(df):
+    """Cleans the DataFrame in a format that can be used to create graphs.
+
+    Args:
+        df (DataFrame): The DataFrame gotten immediately after reading
+
+    Returns:
+        [type]: [description]
+    """
+    df = df.rename(columns=constants.column_mapper)
+    df = df[constants.columns_to_keep]
+    return df
 
 
 def create_data_table(df):
-    """Create Dash datatable from Pandas DataFrame."""
-
     table = dash_table.DataTable(
         columns=[{"name": col, "id": col} for col in df.columns],
         data=df.to_dict("records"),
@@ -22,46 +86,3 @@ def create_data_table(df):
     )
 
     return table
-
-
-def parse_data_sheet(content, filename):
-    """Convert the uploaded CSV file from the data dashboard to a Pandas DataFrame.
-
-    Args:
-        content (string): Base64-encoded, comma-separated string of values from the CSV file.
-        filename (string): Name of the CSV file uploaded.
-
-    Returns:
-        DataFrame: The Pandas DataFrame which has also been cleaned.
-    """
-    _, content_string = content.split(",")
-    decoded_data = base64.b64decode(content_string)
-
-    try:
-        if "csv" in filename[-3:]:
-            # improved from 56s to 12.6s to 0.8s :D
-            df = pd.read_csv(
-                io.StringIO(decoded_data.decode("utf-8")),
-                delimiter=";",
-                parse_dates=["Time"],
-                date_parser=lambda dt: pd.to_datetime(
-                    dt, format="%a %b %d %H:%M:%S %Y"
-                ),
-                cache_dates=False,
-            )
-            if all(df.columns == slm500_columns) or all(df.columns == slm500_columns):
-                print("File loaded successfully!")
-                return df
-
-    except Exception as e:
-        print(e)
-
-    return None
-
-
-def clean_slm280_data(df):
-    pass
-
-
-def clean_slm500_data(df):
-    pass

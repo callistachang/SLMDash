@@ -1,7 +1,9 @@
-def pressure_and_oxygen_over_time(df):
-    color1 = "#9467BD"
-    color2 = "#F08B00"
+color1 = "#9467BD"
+color2 = "#F08B00"
 
+
+def pressure_and_oxygen_over_time(df):
+    print(df.head())
     data = [
         {
             "x": df["Time"],
@@ -12,7 +14,7 @@ def pressure_and_oxygen_over_time(df):
         },
         {
             "x": df["Time"],
-            "y": df["Oxygen top"],
+            "y": df["Oxygen1"],
             "name": "oxygen",
             "yaxis": "y2",
             "type": "scattergl",

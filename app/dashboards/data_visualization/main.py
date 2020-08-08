@@ -74,15 +74,22 @@ def init_callbacks(app):
     def update_output(content, filename):
         print("Updating...")
         if filename:
-            df = parse_data_sheet(content, filename)
-            if df is not None:
+            data = parse_data_sheet(content, filename)
+            if data is not None:
                 return [
-                    html.P(f"Successfully uploaded: {filename} ✓", className="text-success"),
-                    create_graphs(df),
+                    html.P(
+                        f"Successfully uploaded: {filename} ✓", className="text-success"
+                    ),
+                    html.P(
+                        f"Machine Type: {data['machine_type']}",
+                        className="text-success",
+                    ),
+                    create_graphs(data["cleaned_df"]),
                 ]
             else:
-                return html.Div(
+                return html.P(
                     children=[
-                        "The file you uploaded was either not a CSV file or does not have the expected column names."
-                    ]
+                        "The file you uploaded was either not a CSV file or does not have the expected column names of a SLM280 or SLM500 machine."
+                    ],
+                    className="text-danger",
                 )
