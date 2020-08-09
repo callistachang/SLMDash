@@ -87,15 +87,10 @@ COLUMN_MAPPER = {
     "Gas flow speed": "GasFlowSpeed",
     "Build Chamber": "BuildChamber",
     "Filter Status": "FilterStatus",
-    "Pump1": "Pump",
-    "Cabinet": "Cabinet1",
-    "Cabinet 2": "Cabinet2",
     "Optical Bench": "OpticalBench",
     "Oxygen top": "Oxygen1",
     "Oxygen 1": "Oxygen1",
     "Oxygen 2": "Oxygen2",
-    "Laser Emission Flags": "LaserEmissionFlags",
-    "Laser On Flags": "LaserOnFlags",
 }
 
 COLUMNS_TO_KEEP = [
@@ -104,20 +99,11 @@ COLUMNS_TO_KEEP = [
     "GasTemp",
     "GasFlowSpeed",
     "BuildChamber",
-    "Pump",
     "FilterStatus",
-    "Platform",
-    "Cabinet1",
-    "Cabinet2",
     "OpticalBench",
     "Collimator",
-    "Ambiance",
     "Oxygen1",
     "Oxygen2",
-    "MemTotal",
-    "MemProcess",
-    "LaserEmissionFlags",
-    "LaserOnFlags",
 ]
 
 DROPDOWN_OPTIONS = [
@@ -125,8 +111,11 @@ DROPDOWN_OPTIONS = [
     {"label": "Gas Temperature", "value": "GasTemp"},
     {"label": "Gas Flow Speed", "value": "GasFlowSpeed"},
     {"label": "Build Chamber", "value": "BuildChamber"},
-    {"label": "Pump", "value": "Pump"},
     {"label": "Filter Status", "value": "FilterStatus"},
+    {"label": "Oxygen 1", "value": "Oxygen1"},
+    {"label": "Oxygen 2", "value": "Oxygen2"},
+    {"label": "Collimator", "value": "Collimator"},
+    {"label": "Optical Bench", "value": "OpticalBench"},
 ]
 
 TEMP_COLUMNS = ["Time", "MachineType", "NumDataPoints"]
