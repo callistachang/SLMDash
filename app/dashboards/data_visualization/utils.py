@@ -7,7 +7,7 @@ import io
 import dash_table
 import dash_html_components as html
 
-from . import constants
+from . import constants as c
 
 
 def parse_data_sheet(content, filename):
@@ -18,11 +18,12 @@ def parse_data_sheet(content, filename):
         filename (string): Name of the CSV file uploaded.
 
     Returns:
-        Dictionary: Contains the cleaned Pandas DataFrame and the machine type derived from the CSV file.
+        Dictionary: Contains the cleaned Pandas DataFrame as JSON dictionary, and the machine type derived from the CSV file.
     """
     _, content_string = content.split(",")
     decoded_data = base64.b64decode(content_string)
 
+<<<<<<< HEAD
 <<<<<<< Updated upstream
     try:
         if "csv" in filename[-3:]:
@@ -60,6 +61,8 @@ def parse_data_sheet(content, filename):
     except Exception as e:
         print(e)
 =======
+=======
+>>>>>>> 6c992c1ea6b0a2a76a6eef51f0bc39914c07efa6
     df_columns = pd.read_csv(
         io.StringIO(decoded_data.decode("utf-8")), nrows=1, delimiter=";"
     ).columns
@@ -71,6 +74,10 @@ def parse_data_sheet(content, filename):
         elif machine_type == "SLM500":
             datetime_format = "%a %b %d %H:%M:%S %Y"
 
+<<<<<<< HEAD
+=======
+        # improved from 56s to 12.6s to 0.8s :D
+>>>>>>> 6c992c1ea6b0a2a76a6eef51f0bc39914c07efa6
         df = pd.read_csv(
             io.StringIO(decoded_data.decode("utf-8")),
             delimiter=";",
@@ -84,14 +91,29 @@ def parse_data_sheet(content, filename):
         df = clean_dataframe(df)
         df["MachineType"] = machine_type
         df["NumDataPoints"] = len(df)
+<<<<<<< HEAD
 
         step = len(df) // 40000
         df = df.iloc[::step].reset_index()
 
         return df
 >>>>>>> Stashed changes
+=======
+        return df
+>>>>>>> 6c992c1ea6b0a2a76a6eef51f0bc39914c07efa6
 
     return None
+
+
+def check_machine_type(df_columns):
+    machine_type = None
+    if len(df_columns) == len(c.SLM280_COLUMNS) and all(df_columns == c.SLM280_COLUMNS):
+        machine_type = "SLM280"
+    elif len(df_columns) == len(c.SLM500_COLUMNS) and all(
+        df_columns == c.SLM500_COLUMNS
+    ):
+        machine_type = "SLM500"
+    return machine_type
 
 
 def clean_dataframe(df):
@@ -103,24 +125,6 @@ def clean_dataframe(df):
     Returns:
         [type]: [description]
     """
-<<<<<<< Updated upstream
-    df = df.rename(columns=constants.column_mapper)
-    df = df[constants.columns_to_keep]
-    return df
-
-
-def create_data_table(df):
-    table = dash_table.DataTable(
-        columns=[{"name": col, "id": col} for col in df.columns],
-        data=df.to_dict("records"),
-        sort_action="native",
-        sort_mode="native",
-        page_size=10,
-    )
-
-    return table
-=======
     df = df.rename(columns=c.COLUMN_MAPPER)
     df = df[c.COLUMNS_TO_KEEP]
     return df
->>>>>>> Stashed changes

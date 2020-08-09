@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import os
 import datetime
 
 import dash
@@ -10,6 +11,7 @@ import dash_core_components as dcc
 from .layout import html_layout
 from . import graphs
 from .utils import parse_data_sheet
+from . import constants as c
 
 
 def create_dashboard(server):
@@ -46,26 +48,31 @@ def create_layout():
                 ),
                 className="mx-auto w-50 text-center rounded",
                 style={
-                    "lineHeight": "60px",
+                    "lineHeight": "36px",
                     "border": "1px dashed",
                     "cursor": "pointer",
                 },
             ),
-            html.Div(id="dynamically-generated-graphs", className="text-center py-4"),
+            dcc.Dropdown(
+                id="filter-component",
+                options=c.DROPDOWN_OPTIONS,
+                multi=True,
+                clearable=False,
+                value=["Pressure"],
+                className="mx-auto pt-3 w-50",
+            ),
+            html.Div(id="dashboard-component", className="text-center"),
+            dcc.Store(id="store"),
         ],
         className="container-fluid",
     )
 
 
-def create_graphs(df):
-    return html.Div(
-        children=[
-            dcc.Graph(figure=graphs.pressure_and_oxygen_over_time(df), className="col"),
-        ],
-        className="row",
+def init_callbacks(app):
+    @app.callback(
+        Output("store", "data"),
+        [Input("upload-component", "contents"), Input("upload-component", "filename"),],
     )
-<<<<<<< Updated upstream
-=======
     def upload(csv_contents, csv_filename):
         print("Uploading...")
         if csv_filename:
@@ -82,41 +89,33 @@ def create_graphs(df):
                     "filepath": filepath,
                     "valid_upload": True,
                 }
->>>>>>> Stashed changes
+            return {"valid_upload": False}
 
-
-def init_callbacks(app):
     @app.callback(
-        Output("dynamically-generated-graphs", "children"),
-        [Input("upload-component", "contents"), Input("upload-component", "filename")],
+        Output("dashboard-component", "children"),
+        [Input("store", "data"), Input("filter-component", "value")],
     )
-    def update_output(content, filename):
+    def update(data, column_filters):
         print("Updating...")
-<<<<<<< Updated upstream
-        if filename:
-            data = parse_data_sheet(content, filename)
-            if data is not None:
-=======
         try:
             if data["valid_upload"]:
                 column_filters += c.TEMP_COLUMNS
                 df = pd.read_feather(data["filepath"])[column_filters]
-                print(len(df))
->>>>>>> Stashed changes
                 return [
                     html.P(
-                        f"Successfully uploaded: {filename} ✓", className="text-success"
+                        f"Successfully uploaded: {data['filename']} ♦ Machine Type: {df.loc[0, 'MachineType']} ♦ Number of Data Points: {df.loc[0, 'NumDataPoints']}",
+                        className="text-success pt-3",
                     ),
-                    html.P(
-                        f"Machine Type: {data['machine_type']}",
-                        className="text-success",
+                    dcc.Graph(
+                        id="main-graph",
+                        figure=graphs.main_graph(df),
+                        style={"height": "65%"},
                     ),
-                    create_graphs(data["cleaned_df"]),
                 ]
             else:
                 return html.P(
-                    children=[
-                        "The file you uploaded was either not a CSV file or does not have the expected column names of a SLM280 or SLM500 machine."
-                    ],
-                    className="text-danger",
+                    children="The file you uploaded was either not a CSV file or does not have the expected column names of a SLM280 or SLM500 machine.",
+                    className="text-danger pt-3",
                 )
+        except:
+            pass

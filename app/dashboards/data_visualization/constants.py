@@ -1,4 +1,6 @@
-slm280_columns = [
+MEDIA_PATH = "./app/media"
+
+SLM280_COLUMNS = [
     "Time",
     "Platform",
     "Build Chamber",
@@ -42,7 +44,7 @@ slm280_columns = [
     "Galvo Y1",
 ]
 
-slm500_columns = [
+SLM500_COLUMNS = [
     "Time",
     "Pressure",
     "Filter Status",
@@ -80,7 +82,7 @@ slm500_columns = [
     "Optic1 Home-in Y2",
 ]
 
-column_mapper = {
+COLUMN_MAPPER = {
     "Gas Temp": "GasTemp",
     "Gas flow speed": "GasFlowSpeed",
     "Build Chamber": "BuildChamber",
@@ -96,7 +98,7 @@ column_mapper = {
     "Laser On Flags": "LaserOnFlags",
 }
 
-columns_to_keep = [
+COLUMNS_TO_KEEP = [
     "Time",
     "Pressure",
     "GasTemp",
@@ -117,8 +119,6 @@ columns_to_keep = [
     "LaserEmissionFlags",
     "LaserOnFlags",
 ]
-<<<<<<< Updated upstream
-=======
 
 DROPDOWN_OPTIONS = [
     {"label": "Pressure", "value": "Pressure"},
@@ -130,4 +130,3 @@ DROPDOWN_OPTIONS = [
 ]
 
 TEMP_COLUMNS = ["Time", "MachineType", "NumDataPoints"]
->>>>>>> Stashed changes
