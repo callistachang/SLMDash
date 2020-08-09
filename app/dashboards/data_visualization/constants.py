@@ -1,4 +1,6 @@
-slm280_columns = [
+MEDIA_PATH = "./app/media"
+
+SLM280_COLUMNS = [
     "Time",
     "Platform",
     "Build Chamber",
@@ -42,7 +44,7 @@ slm280_columns = [
     "Galvo Y1",
 ]
 
-slm500_columns = [
+SLM500_COLUMNS = [
     "Time",
     "Pressure",
     "Filter Status",
@@ -80,7 +82,7 @@ slm500_columns = [
     "Optic1 Home-in Y2",
 ]
 
-column_mapper = {
+COLUMN_MAPPER = {
     "Gas Temp": "GasTemp",
     "Gas flow speed": "GasFlowSpeed",
     "Build Chamber": "BuildChamber",
@@ -96,7 +98,7 @@ column_mapper = {
     "Laser On Flags": "LaserOnFlags",
 }
 
-columns_to_keep = [
+COLUMNS_TO_KEEP = [
     "Time",
     "Pressure",
     "GasTemp",
@@ -118,7 +120,7 @@ columns_to_keep = [
     "LaserOnFlags",
 ]
 
-dropdown_options = [
+DROPDOWN_OPTIONS = [
     {"label": "Pressure", "value": "Pressure"},
     {"label": "Gas Temperature", "value": "GasTemp"},
     {"label": "Gas Flow Speed", "value": "GasFlowSpeed"},
@@ -126,3 +128,5 @@ dropdown_options = [
     {"label": "Pump", "value": "Pump"},
     {"label": "Filter Status", "value": "FilterStatus"},
 ]
+
+TEMP_COLUMNS = ["Time", "MachineType", "NumDataPoints"]

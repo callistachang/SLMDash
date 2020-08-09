@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import os
 import datetime
 
 import dash
@@ -10,7 +11,7 @@ import dash_core_components as dcc
 from .layout import html_layout
 from . import graphs
 from .utils import parse_data_sheet
-from . import constants
+from . import constants as c
 
 
 def create_dashboard(server):
@@ -54,75 +55,67 @@ def create_layout():
             ),
             dcc.Dropdown(
                 id="filter-component",
-                options=constants.dropdown_options,
+                options=c.DROPDOWN_OPTIONS,
                 multi=True,
                 clearable=False,
                 value=["Pressure"],
                 className="mx-auto pt-3 w-50",
             ),
-            # html.Div(id="info-component", className="text-center pt-2"),
-            html.Div(id="dashboard-component", className="text-center")
-            # html.Div(id="dashboard-body", className="text-center py-4"),
+            html.Div(id="dashboard-component", className="text-center"),
+            dcc.Store(id="store"),
         ],
         className="container-fluid",
     )
 
 
 def init_callbacks(app):
-    # @app.callback(
-    #     Output("info-component", "children"),
-    #     [
-    #         Input("graphs-component", "children")
-    #         # Input("upload-component", "contents"),
-    #         # Input("upload-component", "filename"),
-    #         # Input("filter-component", "value"),
-    #     ],
-    #     [State('upload-component', 'filename')]
-    # )
-    # def update_info(graph_component):
-    #     print("info...")
-    #     if graph_component:
-    #         return html.P(
-    #                     f"Successfully uploaded: {csv_filename} ♦ Machine Type: {data['machine_type']}",
-    #                     className="text-success",
-    #                 )
-    #     else:
-    #         return html.P("The file you uploaded was either not a CSV file or does not have the expected column names of a SLM280 or SLM500 machine.", className="text-danger")
+    @app.callback(
+        Output("store", "data"),
+        [Input("upload-component", "contents"), Input("upload-component", "filename"),],
+    )
+    def upload(csv_contents, csv_filename):
+        print("Uploading...")
+        if csv_filename:
+            if csv_filename[-4:] == ".csv":
+                filename = csv_filename[:-4]
+                filepath = f"{c.MEDIA_PATH}/{filename}.ftr"
+                if os.path.exists(filepath):
+                    print("Cache hit!")
+                else:
+                    df = parse_data_sheet(csv_contents, csv_filename)
+                    step = df.loc[0, 'NumDataPoints'] // 50000
+                    df = df.iloc[::step].reset_index()
+                    df.to_feather(filepath)
+                return {"filename": filename, "filepath": filepath, "valid_upload": True}
+
+            return {"valid_upload": False}
 
     @app.callback(
         Output("dashboard-component", "children"),
-        [
-            Input("upload-component", "contents"),
-            Input("upload-component", "filename"),
-            Input("filter-component", "value")
-        ],
-        # [State("filter-component", "value")],
+        [Input("store", "data"), Input("filter-component", "value")],
     )
-    def update(csv_contents, csv_filename, column_filters):
+    def update(data, column_filters):
         print("Updating...")
-        if csv_filename:
-            data = parse_data_sheet(csv_contents, csv_filename)
-            column_filters += ["Time"]
-            df = data["cleaned_df"][column_filters]
-            if data is not None:
+        try:
+            if data['valid_upload']:
+                column_filters += c.TEMP_COLUMNS
+                df = pd.read_feather(data["filepath"])[column_filters]
+                print(len(df))
                 return [
-                        html.P(
-                        f"Successfully uploaded: {csv_filename} ♦ Machine Type: {data['machine_type']}",
+                    html.P(
+                        f"Successfully uploaded: {data['filename']} ♦ Machine Type: {df.loc[0, 'MachineType']} ♦ Number of Data Points: {df.loc[0, 'NumDataPoints']}",
                         className="text-success pt-3",
                     ),
-                        dcc.Graph(id="main-graph", figure=graphs.main_graph(df), className="h-50")
-                    ]
+                    dcc.Graph(
+                        id="main-graph",
+                        figure=graphs.main_graph(df),
+                        style={"height": "65%"},
+                    ),
+                ]
             else:
                 return html.P(
                     children="The file you uploaded was either not a CSV file or does not have the expected column names of a SLM280 or SLM500 machine.",
-                    className="text-danger",
+                    className="text-danger pt-3",
                 )
-
-
-# def create_graphs(df, column_filters):
-#     column_filters += ["Time"]
-#     df = df[column_filters]
-#     return html.Div(
-#         children=[dcc.Graph(id="main-graph", figure=graphs.main_graph(df), className="col"),],
-#         className="row",
-#     )
+        except:
+            pass
