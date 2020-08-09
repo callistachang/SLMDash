@@ -29,11 +29,11 @@ Run `black .` before committing to the repo to standardize code formatting.
 
 ## Changelog
 
-| Version | Features                                                            |
-| ------- | ------------------------------------------------------------------- |
-| v1      | working flask app + static data dashboard                           |
-| v2      | upload csv functionality on the data dashboard + fixed slow loading |
-| v3      | index page + skeletons for each of the 4 sections                   |
+| Version | Description                                                                          |
+| ------- | ------------------------------------------------------------------------------------ |
+| v1      | Working Flask app with a static data dashboard.                                      |
+| v2      | Able to upload CSV files to generate graphs dynamically. No more slow loading issue. |
+| v3      | Index page. Skeletons for 3 new sections.                                            |
 
 See the list of issues [here](https://github.com/callistachang/dashboard-app/issues).
 

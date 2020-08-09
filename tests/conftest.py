@@ -4,11 +4,5 @@ from app import create_app
 
 
 @pytest.fixture
-def app():
-    yield create_app()
-
-
-@pytest.fixture
-def client(app):
-    with app.test_client() as client:
-        return client
+def client():
+    return create_app().test_client()
