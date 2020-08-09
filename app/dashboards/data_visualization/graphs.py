@@ -5,7 +5,7 @@ def main_graph(df):
     columns = [col for col in df.columns if not col in TEMP_COLUMNS]
 
     data = [
-        {"x": df["Time"], "y": df[col], "name": col, "type": "scattergl",}
+        {"x": df["Time"], "y": df[col], "name": col, "type": "scattergl"}
         for col in columns
     ]
 

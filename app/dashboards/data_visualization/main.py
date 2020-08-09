@@ -23,13 +23,8 @@ def create_dashboard(server):
             "https://use.fontawesome.com/releases/v5.8.1/css/all.css",
         ],
     )
-
-    # Custom HTML layout
     dash_app.index_string = html_layout
-
-    # Create Layout
     dash_app.layout = create_layout()
-
     init_callbacks(dash_app)
 
     return dash_app.server
@@ -57,7 +52,6 @@ def create_layout():
                 id="filter-component",
                 options=c.DROPDOWN_OPTIONS,
                 multi=True,
-                clearable=False,
                 value=["Pressure"],
                 className="mx-auto pt-3 w-50",
             ),
@@ -109,7 +103,7 @@ def init_callbacks(app):
                     dcc.Graph(
                         id="main-graph",
                         figure=graphs.main_graph(df),
-                        style={"height": "65%"},
+                        style={"height": "80%"},
                     ),
                 ]
             else:
