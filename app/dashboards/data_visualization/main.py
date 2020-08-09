@@ -64,6 +64,25 @@ def create_graphs(df):
         ],
         className="row",
     )
+<<<<<<< Updated upstream
+=======
+    def upload(csv_contents, csv_filename):
+        print("Uploading...")
+        if csv_filename:
+            if csv_filename[-4:] == ".csv":
+                filename = csv_filename[:-4]
+                filepath = f"{c.MEDIA_PATH}/{filename}.ftr"
+                if os.path.exists(filepath):
+                    print("Cache hit!")
+                else:
+                    df = parse_data_sheet(csv_contents, csv_filename)
+                    df.to_feather(filepath)
+                return {
+                    "filename": filename,
+                    "filepath": filepath,
+                    "valid_upload": True,
+                }
+>>>>>>> Stashed changes
 
 
 def init_callbacks(app):
@@ -73,9 +92,17 @@ def init_callbacks(app):
     )
     def update_output(content, filename):
         print("Updating...")
+<<<<<<< Updated upstream
         if filename:
             data = parse_data_sheet(content, filename)
             if data is not None:
+=======
+        try:
+            if data["valid_upload"]:
+                column_filters += c.TEMP_COLUMNS
+                df = pd.read_feather(data["filepath"])[column_filters]
+                print(len(df))
+>>>>>>> Stashed changes
                 return [
                     html.P(
                         f"Successfully uploaded: {filename} ✓", className="text-success"

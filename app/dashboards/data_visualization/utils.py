@@ -23,6 +23,7 @@ def parse_data_sheet(content, filename):
     _, content_string = content.split(",")
     decoded_data = base64.b64decode(content_string)
 
+<<<<<<< Updated upstream
     try:
         if "csv" in filename[-3:]:
             df_columns = pd.read_csv(
@@ -58,6 +59,37 @@ def parse_data_sheet(content, filename):
 
     except Exception as e:
         print(e)
+=======
+    df_columns = pd.read_csv(
+        io.StringIO(decoded_data.decode("utf-8")), nrows=1, delimiter=";"
+    ).columns
+    machine_type = check_machine_type(df_columns)
+
+    if machine_type:
+        if machine_type == "SLM280":
+            datetime_format = "%m/%d/%y %H:%M:%S"
+        elif machine_type == "SLM500":
+            datetime_format = "%a %b %d %H:%M:%S %Y"
+
+        df = pd.read_csv(
+            io.StringIO(decoded_data.decode("utf-8")),
+            delimiter=";",
+            parse_dates=["Time"],
+            date_parser=lambda dt: pd.to_datetime(
+                dt, format=datetime_format, errors="coerce"
+            ),
+            cache_dates=False,
+        )
+
+        df = clean_dataframe(df)
+        df["MachineType"] = machine_type
+        df["NumDataPoints"] = len(df)
+
+        step = len(df) // 40000
+        df = df.iloc[::step].reset_index()
+
+        return df
+>>>>>>> Stashed changes
 
     return None
 
@@ -71,6 +103,7 @@ def clean_dataframe(df):
     Returns:
         [type]: [description]
     """
+<<<<<<< Updated upstream
     df = df.rename(columns=constants.column_mapper)
     df = df[constants.columns_to_keep]
     return df
@@ -86,3 +119,8 @@ def create_data_table(df):
     )
 
     return table
+=======
+    df = df.rename(columns=c.COLUMN_MAPPER)
+    df = df[c.COLUMNS_TO_KEEP]
+    return df
+>>>>>>> Stashed changes

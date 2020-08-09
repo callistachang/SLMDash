@@ -1,6 +1,12 @@
 color1 = "#9467BD"
 color2 = "#F08B00"
 
+<<<<<<< Updated upstream
+=======
+
+def main_graph(df):
+    columns = [col for col in df.columns if not col in TEMP_COLUMNS]
+>>>>>>> Stashed changes
 
 def pressure_and_oxygen_over_time(df):
     print(df.head())

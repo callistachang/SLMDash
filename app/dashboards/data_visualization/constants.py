@@ -117,3 +117,17 @@ columns_to_keep = [
     "LaserEmissionFlags",
     "LaserOnFlags",
 ]
+<<<<<<< Updated upstream
+=======
+
+DROPDOWN_OPTIONS = [
+    {"label": "Pressure", "value": "Pressure"},
+    {"label": "Gas Temperature", "value": "GasTemp"},
+    {"label": "Gas Flow Speed", "value": "GasFlowSpeed"},
+    {"label": "Build Chamber", "value": "BuildChamber"},
+    {"label": "Pump", "value": "Pump"},
+    {"label": "Filter Status", "value": "FilterStatus"},
+]
+
+TEMP_COLUMNS = ["Time", "MachineType", "NumDataPoints"]
+>>>>>>> Stashed changes
