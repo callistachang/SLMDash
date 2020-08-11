@@ -31,23 +31,14 @@ def create_dashboard(server):
 
 
 def create_layout():
+    upload_style = {
+        "lineHeight": "36px",
+        "border": "1px dashed",
+        "cursor": "pointer",
+    }
     return html.Div(
         children=[
-            dcc.Upload(
-                id="upload-component",
-                children=html.Div(
-                    [
-                        "Drag and Drop or ",
-                        html.A("Select File", style={"textDecoration": "underline"},),
-                    ]
-                ),
-                className="mx-auto w-50 text-center rounded",
-                style={
-                    "lineHeight": "36px",
-                    "border": "1px dashed",
-                    "cursor": "pointer",
-                },
-            ),
+            create_upload_components(),
             dcc.Dropdown(
                 id="filter-component",
                 options=c.DROPDOWN_OPTIONS,
@@ -62,10 +53,47 @@ def create_layout():
     )
 
 
+def create_upload_components():
+    upload_style = {
+        "lineHeight": "28px",
+        "border": "1px dashed",
+        "cursor": "pointer",
+    }
+    return html.Div(
+        children=[
+            dcc.Upload(
+                id="upload-csv-component",
+                children=html.Div(
+                    [
+                        "Drag and drop or select sensor data (SLM280/SLM500) ",
+                        html.A(".csv file", style={"textDecoration": "underline"},),
+                    ]
+                ),
+                className="mx-auto w-50 text-center rounded",
+                style=upload_style,
+            ),
+            dcc.Upload(
+                id="upload-log-component",
+                children=html.Div(
+                    [
+                        "Drag and drop or select related ",
+                        html.A("Program.log file", style={"textDecoration": "underline"},),
+                    ]
+                ),
+                className="mx-auto mt-3 w-50 text-center rounded",
+                style=upload_style,
+            ),
+        ]
+    )
+
+
 def init_callbacks(app):
     @app.callback(
         Output("store", "data"),
-        [Input("upload-component", "contents"), Input("upload-component", "filename"),],
+        [
+            Input("upload-csv-component", "contents"),
+            Input("upload-csv-component", "filename"),
+        ],
     )
     def upload(csv_contents, csv_filename):
         print("Uploading...")

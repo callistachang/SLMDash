@@ -10,7 +10,7 @@ def create_app():
 
     with app.app_context():
         from . import routes
-        from .dashboards.data_visualization.main import create_dashboard
+        from .dashboards.visualization.main import create_dashboard
 
         app = create_dashboard(app)
         return app
