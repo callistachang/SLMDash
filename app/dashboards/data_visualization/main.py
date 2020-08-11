@@ -49,11 +49,16 @@ def create_layout():
                 },
             ),
             dcc.Dropdown(
-                id="filter-component",
+                id="filter-dropdown",
                 options=c.DROPDOWN_OPTIONS,
                 multi=True,
                 value=["Pressure"],
-                className="mx-auto pt-3 w-50",
+                className="mx-auto pt-2 w-50",
+            ),
+            dcc.Checklist(
+                id="anomaly-checkbox",
+                options=[{"label": " Show Anomalies", "value": "ShowAnomalies"}],
+                className="text-center",
             ),
             html.Div(id="dashboard-component", className="text-center"),
             dcc.Store(id="store"),
@@ -85,9 +90,29 @@ def init_callbacks(app):
                 }
             return {"valid_upload": False}
 
+    # @app.callback(Output("info-component", "children"), [Input("store", "data")])
+    # def update_info(data):
+    #     print("Updating info...")
+    #     try:
+    #         if data["valid_upload"]:
+    #             df = pd.read_feather(data["filepath"])
+    #             return html.P(
+    #                 f"Successfully uploaded: {data['filename']} ♦ Machine Type: {df.loc[0, 'MachineType']} ♦ Number of Data Points: {df.loc[0, 'NumDataPoints']}",
+    #                 className="text-success pt-3",
+    #                 id="info-component",
+    #             )
+    #         else:
+    #             return html.P(
+    #                 children="The file you uploaded was either not a CSV file or does not have the expected column names of a SLM280 or SLM500 machine.",
+    #                 className="text-danger pt-3",
+    #                 id="info-component",
+    #             )
+    #     except:
+    #         pass
+
     @app.callback(
         Output("dashboard-component", "children"),
-        [Input("store", "data"), Input("filter-component", "value")],
+        [Input("store", "data"), Input("filter-dropdown", "value"),],
     )
     def update(data, column_filters):
         print("Updating...")
@@ -99,6 +124,7 @@ def init_callbacks(app):
                     html.P(
                         f"Successfully uploaded: {data['filename']} ♦ Machine Type: {df.loc[0, 'MachineType']} ♦ Number of Data Points: {df.loc[0, 'NumDataPoints']}",
                         className="text-success pt-3",
+                        id="info-component",
                     ),
                     dcc.Graph(
                         id="main-graph",
@@ -110,6 +136,37 @@ def init_callbacks(app):
                 return html.P(
                     children="The file you uploaded was either not a CSV file or does not have the expected column names of a SLM280 or SLM500 machine.",
                     className="text-danger pt-3",
+                    id="info-component",
                 )
+        except:
+            pass
+
+    @app.callback(
+        Output("main-graph", "figure"),
+        [Input("anomaly-checkbox", "value")],
+        [State("main-graph", "figure")],
+    )
+    def show_anomalies(value, figure):
+        try:
+            if value:
+                figure['layout']['shapes'] = [
+                    {
+                        "type": "rect",
+                        "xref": "Time",
+                        "yref": "paper",  # y-reference is assigned to the plot paper [0, 1]
+                        "x0": "2020-3-23T18:00:00",
+                        "y0": 0,
+                        "x1": "2020-3-24T06:00:00",
+                        "y1": 1,
+                        "fillcolor": "LightSalmon",
+                        "opacity": 0.5,
+                        "layer": "below",
+                        "line": {"width": 0},
+                    }
+                ]
+                return figure
+            else:
+                del figure['layout']['shapes']
+                return figure
         except:
             pass
