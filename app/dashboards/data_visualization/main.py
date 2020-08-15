@@ -32,21 +32,23 @@ def create_dashboard(server):
 
 def create_layout():
     return html.Div(
-        children=[
-            dcc.Upload(
-                id="upload-component",
-                children=html.Div(
-                    [
-                        "Drag and Drop or ",
-                        html.A("Select File", style={"textDecoration": "underline"},),
-                    ]
-                ),
-                className="mx-auto w-50 text-center rounded",
-                style={
-                    "lineHeight": "36px",
-                    "border": "1px dashed",
-                    "cursor": "pointer",
-                },
+        [
+            html.Div(
+                [
+                    dcc.Upload(
+                        "Upload New File",
+                        id="upload-component",
+                        className="px-5 text-center rounded",
+                        style={
+                            "lineHeight": "36px",
+                            "border": "1px dashed",
+                            "cursor": "pointer",
+                        },
+                    ),
+                    html.Span("OR", className="mx-3 pt-2 font-weight-bold"),
+                    upload_history(),
+                ],
+                className="d-flex justify-content-center",
             ),
             dcc.Dropdown(
                 id="filter-component",
@@ -57,33 +59,63 @@ def create_layout():
             ),
             html.Div(id="dashboard-component", className="text-center"),
             dcc.Store(id="store"),
+        ]
+    )
+
+
+def upload_history():
+    upload_history_options = [
+        {"label": file[:-4], "value": file} for file in os.listdir(c.MEDIA_PATH)
+    ]
+
+    return html.Div(
+        children=[
+            dcc.Dropdown(
+                id="history-component",
+                options=upload_history_options,
+                placeholder="Use Past Uploads",
+            )
         ],
-        className="container-fluid",
+        className="w-25 text-center",
     )
 
 
 def init_callbacks(app):
     @app.callback(
         Output("store", "data"),
-        [Input("upload-component", "contents"), Input("upload-component", "filename"),],
+        [
+            Input("upload-component", "contents"),
+            Input("upload-component", "filename"),
+            Input("history-component", "value"),
+        ],
     )
-    def upload(csv_contents, csv_filename):
-        print("Uploading...")
-        if csv_filename:
-            if csv_filename[-4:] == ".csv":
-                filename = csv_filename[:-4]
-                filepath = f"{c.MEDIA_PATH}/{filename}.ftr"
-                if os.path.exists(filepath):
-                    print("Cache hit!")
-                else:
-                    df = parse_data_sheet(csv_contents, csv_filename)
-                    df.to_feather(filepath)
-                return {
-                    "filename": filename,
-                    "filepath": filepath,
-                    "valid_upload": True,
-                }
-            return {"valid_upload": False}
+    def upload(csv_contents, csv_filename, history_filename):
+        fired_input = dash.callback_context.triggered[0]["prop_id"]
+
+        if fired_input == "history-component.value":
+            print("Looking through past uploads...")
+            return {
+                "filename": history_filename[:-4],
+                "filepath": f"{c.MEDIA_PATH}/{history_filename}",
+                "valid_upload": True,
+            }
+        else:
+            print("Uploading...")
+            if csv_filename:
+                if csv_filename[-4:] == ".csv":
+                    filename = csv_filename[:-4]
+                    filepath = f"{c.MEDIA_PATH}/{filename}.ftr"
+                    if os.path.exists(filepath):
+                        print("Cache hit!")
+                    else:
+                        df = parse_data_sheet(csv_contents, csv_filename)
+                        df.to_feather(filepath)
+                    return {
+                        "filename": filename,
+                        "filepath": filepath,
+                        "valid_upload": True,
+                    }
+        return {"valid_upload": False}
 
     @app.callback(
         Output("dashboard-component", "children"),
@@ -95,6 +127,7 @@ def init_callbacks(app):
             if data["valid_upload"]:
                 column_filters += c.TEMP_COLUMNS
                 df = pd.read_feather(data["filepath"])[column_filters]
+                print("Success!")
                 return [
                     html.P(
                         f"Successfully uploaded: {data['filename']} ♦ Machine Type: {df.loc[0, 'MachineType']} ♦ Number of Data Points: {df.loc[0, 'NumDataPoints']}",
