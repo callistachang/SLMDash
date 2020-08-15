@@ -98,32 +98,34 @@ def init_callbacks(app):
         ],
     )
     def upload(csv_contents, csv_filename, history_filename):
-        fired_input = dash.callback_context.triggered[0]["prop_id"]
-
-        if "history-component" in fired_input:
-            print("Looking through past uploads...")
-            return {
-                "filename": history_filename[:-4],
-                "filepath": f"{c.MEDIA_PATH}/{history_filename}",
-                "valid_upload": True,
-            }
-        elif "upload-component" in fired_input:
-            print("Uploading...")
-            if csv_filename:
-                if csv_filename[-4:] == ".csv":
-                    filename = csv_filename[:-4]
-                    filepath = f"{c.MEDIA_PATH}/{filename}.ftr"
-                    if os.path.exists(filepath):
-                        print("Cache hit!")
-                    else:
-                        df = parse_data_sheet(csv_contents, csv_filename)
-                        df.to_feather(filepath)
-                    return {
-                        "filename": filename,
-                        "filepath": filepath,
-                        "valid_upload": True,
-                    }
-            return {"valid_upload": False}
+        try:
+            fired_input = dash.callback_context.triggered[0]["prop_id"]
+            if "history-component" in fired_input:
+                print("Looking through past uploads...")
+                return {
+                    "filename": history_filename[:-4],
+                    "filepath": f"{c.MEDIA_PATH}/{history_filename}",
+                    "valid_upload": True,
+                }
+            elif "upload-component" in fired_input:
+                print("Uploading...")
+                if csv_filename:
+                    if csv_filename[-4:] == ".csv":
+                        filename = csv_filename[:-4]
+                        filepath = f"{c.MEDIA_PATH}/{filename}.ftr"
+                        if os.path.exists(filepath):
+                            print("Cache hit!")
+                        else:
+                            df = parse_data_sheet(csv_contents, csv_filename)
+                            df.to_feather(filepath)
+                        return {
+                            "filename": filename,
+                            "filepath": filepath,
+                            "valid_upload": True,
+                        }
+                return {"valid_upload": False}
+        except:
+            pass
 
     # @app.callback(Output("info-component", "children"), [Input("store", "data")])
     # def update_info(data):
@@ -149,8 +151,8 @@ def init_callbacks(app):
         Output("dashboard-component", "children"),
         [Input("store", "data"), Input("filter-dropdown", "value"),],
     )
-    def update(data, column_filters):
-        print("Updating...")
+    def update_dashboard(data, column_filters):
+        print(f"update_dashboard, data: {data}, column_filters: {column_filters}")
         try:
             if data["valid_upload"]:
                 column_filters += c.TEMP_COLUMNS
@@ -183,26 +185,23 @@ def init_callbacks(app):
         [State("main-graph", "figure")],
     )
     def show_anomalies(value, figure):
-        try:
-            if value:
-                figure['layout']['shapes'] = [
-                    {
-                        "type": "rect",
-                        "xref": "Time",
-                        "yref": "paper",  # y-reference is assigned to the plot paper [0, 1]
-                        "x0": "2020-3-23T18:00:00",
-                        "y0": 0,
-                        "x1": "2020-3-24T06:00:00",
-                        "y1": 1,
-                        "fillcolor": "LightSalmon",
-                        "opacity": 0.5,
-                        "layer": "below",
-                        "line": {"width": 0},
-                    }
-                ]
-                return figure
-            else:
-                del figure['layout']['shapes']
-                return figure
-        except:
-            pass
+        print(f"show_anomalies(), checkbox value: {value}")
+        if value:
+            figure["layout"]["shapes"] = [
+                {
+                    "type": "rect",
+                    "xref": "Time",
+                    "yref": "paper",  # y-reference is assigned to the plot paper [0, 1]
+                    "x0": "2020-3-23T18:00:00",
+                    "y0": 0,
+                    "x1": "2020-3-24T06:00:00",
+                    "y1": 1,
+                    "fillcolor": "LightSalmon",
+                    "opacity": 0.5,
+                    "layer": "below",
+                    "line": {"width": 0},
+                }
+            ]
+        elif not value and "shapes" in figure["layout"]:
+            del figure["layout"]["shapes"]
+        return figure
