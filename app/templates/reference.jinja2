@@ -1,0 +1,162 @@
+{% extends "base.jinja2" %}
+
+{% block content %}
+
+<style>
+.report-section {
+    margin: 1em 0.5em;
+}
+p {
+    line-height: 1;
+}
+h4 {
+    margin-bottom: 1%;
+}
+</style>
+
+<div class="report-section">
+    <h4>Introduction</h4>
+    <p>This reference is catered towards the SLM Solutions Selective Laser Melting Machines: <b>SLM280</b> & <b>SLM500</b>, which this dashboard was created for.</p>
+    <p>Technical specifications from the official website can be found in the links below:<p>
+    <ul>
+        <li><a href="https://www.slm-solutions.com/products/machines/slmr280/">SLM®280 PRODUCTION SERIES</a></li>
+        <li><a href="https://www.slm-solutions.com/products/machines/slm500/">SLM®500 PRODUCTION SERIES</a></li>
+    </ul>
+    <p>The table below describes the important variables in the process of using the machines.</p>
+    <h4>Variables</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Variable</th>
+                <th scope="col">Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">1</th>
+                <td>Pressure</td>
+                <td>
+                    <ul>
+                        <li>Refers to the chamber pressure</li>
+                        <li>Expected to be around 12mbar during printing</li>
+                        <li>Need to alert when pressure fluctuates</li>
+                        <li>Pressure is high when flooding before printing</li>
+                        <li>Pressure becomes zero when the chamber door is open</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">2</th>
+                <td>Filter Status</td>
+                <td>
+                    <ul>
+                        <li>Refers to the pressure inside the filter</li>
+                        <li>Expected to be <80mbar</li>
+                        <li>Need to alert to change the filter when it is >100mbar</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">3</th>
+                <td>Gas Flow Speed</td>
+                <td>
+                    <ul>
+                        <li>Refers to the gas flow speed of argon gas</li>
+                        <li>Expected to be around 20m/s</li>
+                        <li>Need to increase gas pump power when speed is low</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <th scope='row'>4</th>
+                <td>Gas Pump Power</td>
+                <td>
+                    <ul>
+                        <li>% of pump power for gas flow</li>
+                        <li>Expected to remain stable during printing </li>
+                        <li>Need to alert when it is >90% to achieve desired gas flow speed</li>
+                        <li>Absent in SLM280</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">5</th>
+                <td>Oxygen Top</td>
+                <td>
+                    <ul>
+                        <li>Refers to the percentage of oxygen at powder tank</li>
+                        <li>Expected to be around 0.00 after a few hours</li>
+                        <li>The job can start when it is <0.10% and should gradually decrease to 0</li>
+                        <li>Named as Oxygen 1 in SLM280</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">6</th>
+                <td>Oxygen 2</td>
+                <td>
+                    <ul>
+                        <li>Refers to the temperature of oxygen at the build chamber</li>
+                        <li>Expected to be around 0.00 after a few hours</li>
+                        <li>The job can start when <0.10% and should gradually decrease to 0</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">7</th>
+                <td>Gas Temperature</td>
+                <td>
+                    <ul>
+                        <li>Refers to the temperature of the gas flow</li>
+                        <li>Expected to remain stable during printing</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">8</th>
+                <td>Platform</td>
+                <td>
+                    <ul>
+                        <li>Refers to the temperature of the platform</li>
+                        <li>Expected to remain stable during printing</li>
+                        <li>Normally it is 200 degrees for printing Ti6Al4V</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">9</th>
+                <td>Build Chamber</td>
+                <td>
+                    <ul>
+                        <li>Refers to the temperature of the build chamber</li>
+                        <li>Expected to remain stable during printing</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">10</th>
+                <td>Optical Bench</td>
+                <td>
+                    <ul>
+                        <li>Refers to the temperature of the optical bench</li>
+                        <li>Expected to remain stable during printing</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">11</th>
+                <td>Collimator</td>
+                <td>
+                    <ul>
+                        <li>Refers to the temperature of the collimator</li>
+                        <li>Expected to remain stable during printing</li>
+                    </ul>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}
