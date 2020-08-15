@@ -64,22 +64,23 @@ def create_layout():
 
 
 def upload_history():
-    upload_history_options = [
-        {"label": file[:-4], "value": file}
-        for file in os.listdir(c.MEDIA_PATH)
-        if os.listdir(c.MEDIA_PATH)
-    ]
+    try:
+        upload_history_options = [
+            {"label": file[:-4], "value": file} for file in os.listdir(c.MEDIA_PATH)
+        ]
 
-    return html.Div(
-        children=[
-            dcc.Dropdown(
-                id="history-component",
-                options=upload_history_options,
-                placeholder="Use Past Uploads",
-            )
-        ],
-        className="w-25 text-center",
-    )
+        return html.Div(
+            children=[
+                dcc.Dropdown(
+                    id="history-component",
+                    options=upload_history_options,
+                    placeholder="Use Past Uploads",
+                )
+            ],
+            className="w-25 text-center",
+        )
+    except:
+        pass
 
 
 def init_callbacks(app):
