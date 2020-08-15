@@ -92,14 +92,14 @@ def init_callbacks(app):
     def upload(csv_contents, csv_filename, history_filename):
         fired_input = dash.callback_context.triggered[0]["prop_id"]
 
-        if fired_input == "history-component.value":
+        if "history-component" in fired_input:
             print("Looking through past uploads...")
             return {
                 "filename": history_filename[:-4],
                 "filepath": f"{c.MEDIA_PATH}/{history_filename}",
                 "valid_upload": True,
             }
-        else:
+        elif "upload-component" in fired_input:
             print("Uploading...")
             if csv_filename:
                 if csv_filename[-4:] == ".csv":
@@ -115,7 +115,7 @@ def init_callbacks(app):
                         "filepath": filepath,
                         "valid_upload": True,
                     }
-        return {"valid_upload": False}
+            return {"valid_upload": False}
 
     @app.callback(
         Output("dashboard-component", "children"),
