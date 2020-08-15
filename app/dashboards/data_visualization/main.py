@@ -65,7 +65,9 @@ def create_layout():
 
 def upload_history():
     upload_history_options = [
-        {"label": file[:-4], "value": file} for file in os.listdir(c.MEDIA_PATH)
+        {"label": file[:-4], "value": file}
+        for file in os.listdir(c.MEDIA_PATH)
+        if os.listdir(c.MEDIA_PATH)
     ]
 
     return html.Div(
