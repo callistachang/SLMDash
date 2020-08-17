@@ -76,6 +76,7 @@ def create_layout():
                     type="dot",
                 ),
                 id="download-link",
+                href=None,
                 className="d-none",
             ),
             html.Div(id="dashboard-component", className="text-center"),
@@ -121,9 +122,8 @@ def init_callbacks(app):
     def make_image(n_clicks, data, figure, download_href):
         print("make_image()")
         if download_href:
-            return ("", "Initialize Report Download", "btn btn-primary")
+            return (None, "Initialize Report Download", "btn btn-primary")
         else:
-            print("im here")
             template = flask.render_template("report.jinja2")
             pdfkit.from_string(
                 template,
