@@ -61,11 +61,16 @@ def create_layout():
                 className="d-flex justify-content-center",
             ),
             dcc.Dropdown(
-                id="filter-component",
+                id="filter-dropdown",
                 options=c.DROPDOWN_OPTIONS,
                 multi=True,
                 value=["Pressure"],
-                className="mx-auto pt-3 w-50",
+                className="mx-auto pt-2 w-50",
+            ),
+            dcc.Checklist(
+                id="anomaly-checkbox",
+                options=[{"label": " Show Anomalies", "value": "ShowAnomalies"}],
+                className="text-center",
             ),
             html.A(
                 dcc.Loading(
@@ -186,10 +191,10 @@ def init_callbacks(app):
             Output("dashboard-component", "children"),
             Output("download-link", "className"),
         ],
-        [Input("store", "data"), Input("filter-component", "value")],
+        [Input("store", "data"), Input("filter-dropdown", "value")],
     )
-    def update(data, column_filters):
-        print("Updating...")
+    def update_dashboard(data, column_filters):
+        print(f"update_dashboard, data: {data}, column_filters: {column_filters}")
         try:
             download_btn_class = "row justify-content-center pt-3"
             if data["valid_upload"]:
@@ -208,7 +213,7 @@ def init_callbacks(app):
                                 figure=graphs.main_graph(df),
                                 style={"height": "80%"},
                             ),
-                            type="graph",
+                            type="dot",
                         ),
                     ],
                     download_btn_class,
