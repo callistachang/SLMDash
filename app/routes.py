@@ -1,5 +1,7 @@
-from flask import render_template
+from flask import render_template, make_response, send_file
 from flask import current_app as app
+import os
+from urllib.parse import unquote
 
 
 @app.route("/")
@@ -20,6 +22,14 @@ def data_report():
 @app.route("/reports")
 def ml_report():
     return render_template("reports.jinja2", title="Team Reports")
+
+
+@app.route("/download/report/<path:path>")
+def download_reports(path):
+    path = unquote(path)
+    full_path = os.path.join("media", "reports", path)
+
+    return send_file(full_path, as_attachment=True)
 
 
 # /data-dashboard was implicitly routed in main.py
