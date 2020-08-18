@@ -17,6 +17,7 @@ from .layout import html_layout
 from . import graphs
 from .utils import parse_data_sheet
 from . import constants as c
+from .report import Checker
 
 PDFKIT_CONFIG = pdfkit.configuration(
     wkhtmltopdf=os.path.join(os.getcwd(), "app", "static", "wkhtmltopdf.exe")
@@ -124,6 +125,12 @@ def init_callbacks(app):
         if download_href:
             return (None, "Initialize Report Download", "btn btn-primary")
         else:
+            # run the report generator by passing in the df
+            df = pd.read_feather(data["filepath"])
+            df.set_index(["Time"])
+            checker = Checker(df)
+            report_data = checker.generateReport()
+            # put the report data into the template
             template = flask.render_template("report.jinja2")
             pdfkit.from_string(
                 template,
