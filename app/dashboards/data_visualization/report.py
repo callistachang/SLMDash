@@ -2,13 +2,12 @@ from statsmodels.tsa.seasonal import seasonal_decompose
 from sklearn.linear_model import LinearRegression
 import pandas as pd
 
-result = []
-
 
 class Checker:
     def __init__(self, sensor):
         self.sensor = sensor
         self.describe = sensor.describe()
+        self.result = []
 
     def checkPressure(self):
         def detect_stable(trend, std, tol):
@@ -100,9 +99,13 @@ class Checker:
             self.sensor["Pressure"], model="additive", freq=len(self.sensor) // 500
         )
         trend = decomposition.trend
-        # seasonal = decomposition.seasonal
-        # residual = decomposition.resid
-        trend_df = pd.DataFrame(trend).reset_index().dropna()
+        trend_df = (
+            pd.DataFrame(trend)
+            .reset_index()
+            .dropna()
+            .rename(columns={"trend": "Pressure"})
+        )
+        print(trend_df.head())
         stable_tuple = detect_stable(trend_df, 12, 0.1)
         unstable_tuple = detect_unstable(
             trend_df, stable_tuple
@@ -119,7 +122,7 @@ class Checker:
         # Filter Status	Pressure inside filter	<80mbar
         # Need to alert to change filter when >100mbar
         std, alert = 80, 100
-        max = self.describe["Filter Status"]["max"]
+        max = self.describe["FilterStatus"]["max"]
         if max > 100:
             return False, max
         else:
@@ -133,7 +136,7 @@ class Checker:
         #   return True
         # else:
         #   return False
-        return self.checkStability("Gas flow speed")
+        return self.checkStability("GasFlowSpeed")
 
     # def checkPump(self):
     #     if "Gas pump power" in self.sensor.columns:
@@ -144,8 +147,6 @@ class Checker:
     def checkOxygen(self, oxygen):
         # Oxygen top	% of oxygen at powder tank	0.00 after few hours
         # Job can start when <0.10% and should gradually decrease to 0
-        if oxygen not in self.sensor.columns:
-            oxygen = "Oxygen top"
         sensor_abnormal = self.sensor[self.sensor[oxygen] >= 0.1]
         sensor_less = self.sensor[self.sensor[oxygen] < 0.1]
         sensor_zero = self.sensor[self.sensor[oxygen] < 10 ** -3]
@@ -165,12 +166,12 @@ class Checker:
     def checkOxygen1(self):
         # Oxygen 1	% of oxygen at build chamber	0.00 after few hours
         # Job can start when <0.10% and should gradually decrease to 0
-        return self.checkOxygen("Oxygen 1")
+        return self.checkOxygen("Oxygen1")
 
     def checkOxygen2(self):
         # Oxygen 2	% of oxygen at build chamber	0.00 after few hours
         # Job can start when <0.10% and should gradually decrease to 0
-        return self.checkOxygen("Oxygen 2")
+        return self.checkOxygen("Oxygen2")
 
     def checkStability(self, var):
         mean, std = self.describe[var]["mean"], self.describe[var]["std"]
@@ -189,22 +190,22 @@ class Checker:
     def checkGasTemp(self):
         # Gas Temp
         # Temperature of the gas flow	Remain stable during printing
-        return self.checkStability("Gas Temp")
+        return self.checkStability("GasTemp")
 
-    def checkPlat(self):
-        # Platform
-        # Temperature of the platform	Remain stable during printing	Normally it is 200 degrees for printing Ti6Al4V
-        return self.checkStability("Platform")
+    # def checkPlat(self):
+    #     # Platform
+    #     # Temperature of the platform	Remain stable during printing	Normally it is 200 degrees for printing Ti6Al4V
+    #     return self.checkStability("Platform")
 
     def checkChamber(self):
         # Build Chamber	Temperature of build chamber
         # Remain stable during printing
-        return self.checkStability("Build Chamber")
+        return self.checkStability("BuildChamber")
 
     def checkOptical(self):
         # Optical bench	Temperature of optical bench
         # Remain stable during printing
-        return self.checkStability("Optical Bench")
+        return self.checkStability("OpticalBench")
 
     def checkCollimator(self):
         # Collimator
@@ -213,239 +214,199 @@ class Checker:
 
     # report generation function
     def generateReport(self):
-        sep = "---------------------------------------------"
-        print("Pressure: ")
+        report_data = {}
+
+        print("Generating report for Pressure...")
         check, stable, unstable, stable_tur = self.checkPressure()
         score1, slope1, score2, slope2 = check
         score10, slope10, score20, slope20, max1, min1, max2, min2 = stable_tur
-        print(
-            "Pressure remains stable around 12 mbar between {} and {}".format(
-                stable[2], stable[3]
-            )
-        )
+
+        report_data["Pressure"] = [
+            f"Between {stable[2]} and {stable[3]}, pressure is stable (~12mbar)."
+        ]
+
         if score1 != -1 and score10 != -1:
-            print("For the time before {} : ".format(stable[2]))
             if score1 / score10 > 5:
-                print(
-                    "The pressure occurs great fluctuation, ranging from {:.2f} to {:.2f} mbar".format(
-                        min1, max1
-                    )
-                )
-                result.append(-1)
+                pressure_desc = f"pressure fluctuates greatly, ranging from {min1:.2f}mbar to {max1:.2f}mbar."
+                self.result.append(-1)
             elif score1 > 0.85:
                 if slope1 > 0:
-                    print("The pressure keeps increasing smoothly")
-                    result.append(-1)
+                    pressure_desc = "pressure keeps increasing smoothly."
                 else:
-                    print("The pressure keeps decreasing smoothly")
-                    result.append(-1)
+                    pressure_desc = "pressure keeps decreasing smoothly."
             else:
                 if slope1 > 0:
-                    print("The pressure keeps increasing with fluctuation")
-                    result.append(-1)
+                    pressure_desc = "pressure keeps increasing with fluctuation."
                 else:
-                    print("The pressure keeps decreasing with fluctuation")
-                    result.append(-1)
+                    pressure_desc = "pressure keeps decreasing with fluctuation."
+            report_data["Pressure"].append(f"Before {stable[2]}, {pressure_desc}")
+            self.result.append(-1)
         else:
-            result.append(1)
+            self.result.append(1)
 
         if score2 != -1 and score20 != -1:
-            print("For the time after {} : ".format(stable[3]))
             if score2 / score20 > 5:
-                print(
-                    "The pressure occurs great fluctuation, ranging from {:.2f} to {:.2f} mbar".format(
-                        min2, max2
-                    )
-                )
-                result.append(-1)
+                pressure_desc = f"pressure fluctuates greatly, ranging from {min2:.2f}mbar to {max2:.2f}mbar."
             elif score2 > 0.85:
                 if slope2 > 0:
-                    print("The pressure keeps increasing smoothly")
-                    result.append(-1)
+                    pressure_desc = "pressure keeps increasing smoothly."
                 else:
-                    print("The pressure keeps decreasing smoothly")
-                    result.append(-1)
+                    pressure_desc = "pressure keeps decreasing smoothly."
             else:
                 if slope2 > 0:
-                    print("The pressure keeps increasing with fluctuation")
-                    result.append(-1)
+                    pressure_desc = "pressure keeps increasing with fluctuation."
                 else:
-                    print("The pressure keeps decreasing with fluctuation")
-                    result.append(-1)
+                    pressure_desc = "pressure keeps decreasing with fluctuation."
+            report_data["Pressure"].append(f"After {stable[3]}, {pressure_desc}")
+            self.result.append(-1)
         else:
-            result.append(1)
-        print(sep)
+            self.result.append(1)
 
-        print("Filter: ")
+        print("Generating report for FilterStatus...")
         flag, max = self.checkFilter()
         if flag:
-            print(f"OK; Max temperature: {max}°C < 100°C")
-            result.append(1)
+            report_data["FilterStatus"] = f"OK; Max temperature: {max}°C < 100°C."
+            self.result.append(1)
         else:
-            print(f"Abnormal; Max temperature: {max}°C")
-            result.append(-1)
+            report_data["FilterStatus"] = f"Abnormal; Max temperature: {max:.2f}°C."
+            self.result.append(-1)
 
-        print(sep)
-
-        print("Gas flow speed: ")
+        print("Generating report for GasFlowSpeed...")
         flag, min, max, outlier = self.checkFlow()
         if flag:
-            print("OK; Stable between {:.2f} m/s and {:.2f} m/s".format(min, max))
-            result.append(1)
+            report_data[
+                "GasFlowSpeed"
+            ] = f"OK; Stable between {min:.2f}m/s and {max:.2f}m/s."
+            self.result.append(1)
         else:
-            print(
-                "Abnormal; {:.2f}% data fall out the stable range between {:.2f} m/s and {:.2f} m/s".format(
-                    outlier, min, max
-                )
-            )
-            result.append(-1)
-        print(sep)
+            report_data[
+                "GasFlowSpeed"
+            ] = f"Abnormal; {outlier:.2f}% of data fall out the stable range between {min:.2f}m/s and {max:.2f}m/s."
+            self.result.append(-1)
 
         # print("Gas pump power")
         # flag, min, max, outlier = self.checkPump()
         # if max > 90:
         #     print("Alert; Gas pump power reaches {:.2f}% > 90%".format(max))
-        #     result.append(-1)
+        #     self.result.append(-1)
         # elif flag:
         #     print("OK; Stable between {:.2f}% and {:.2f}%".format(min, max))
-        #     result.append(1)
+        #     self.result.append(1)
         # else:
         #     print(
         #         "Abnormal; {:.2f}% data fall out the stable range between {:.2f}% and {:.2f}%".format(
         #             outlier, min, max
         #         )
         #     )
-        #     result.append(-1)
-        # print(sep)
+        #     self.result.append(-1)
+        #
 
-        print("Oxygen 1")
+        print("Generating report for Oxygen 1...")
         flag, v1, v2 = self.checkOxygen1()
         if flag:
-            print("OK; Standard fulfilled")
-            result.append(1)
+            report_data["Oxygen1"] = "OK; Standard fulfilled."
+            self.result.append(1)
         else:
             if v1 == "abnormal":
-                print(
-                    "Abnormal; oxygen concentration >0.1% takes up more time that <0.1% decreasing to 0% takes"
-                )
-                result.append(-1)
+                report_data[
+                    "Oxygen1"
+                ] = "Abnormal; oxygen concentration >0.1% takes up more time than <0.1%."
             elif v1 == "less":
-                print(
-                    "Abnormal; it takes too long to decrease the oxygen concentration to 0%"
-                )
-                result.append(-1)
+                report_data[
+                    "Oxygen1"
+                ] = "Abnormal; it takes too long to decrease the oxygen concentration to 0%."
+
             else:
-                print(
-                    "Abnormal; oxygen concentration >0.1% mainly, ranging from {:.4f} to {:.4f} mainly".format(
-                        v1, v2
-                    )
-                )
-                result.append(-1)
+                report_data[
+                    "Oxygen1"
+                ] = f"Abnormal; oxygen concentration >0.1% mainly, ranging from {v1:.4f} to {v2:.4f} mainly."
+            self.result.append(-1)
 
-        print(sep)
-
-        print("Oxygen 2")
+        print("Generating report for Oxygen 2...")
         flag, v1, v2 = self.checkOxygen2()
         if flag:
-            print("OK; Standard fulfilled")
-            result.append(1)
+            report_data["Oxygen2"] = "OK; Standard fulfilled"
+            self.result.append(1)
         else:
             if v1 == "abnormal":
-                print(
-                    "Abnormal; oxygen concentration >0.1% takes up more time that <0.1%"
-                )
-                result.append(-1)
+                report_data[
+                    "Oxygen2"
+                ] = "Abnormal; oxygen concentration >0.1% takes up more time than <0.1%."
             elif v1 == "less":
-                print(
-                    "Abnormal; it takes too long to decrease the oxygen concentration to 0%"
-                )
-                result.append(-1)
+                report_data[
+                    "Oxygen2"
+                ] = "Abnormal; it takes too long to decrease the oxygen concentration to 0%."
             else:
-                print(
-                    "Abnormal; oxygen concentration >0.1% mainly, ranging from {:.4f} to {:.4f} mainly".format(
-                        v1, v2
-                    )
-                )
-                result.append(-1)
+                report_data[
+                    "Oxygen2"
+                ] = f"Abnormal; oxygen concentration >0.1% mainly, ranging from {v1:.4f} to {v2:.4f} mainly."
+            self.result.append(-1)
 
-        print(sep)
-
-        print("Gas Temperature: ")
+        print("Generating report for gas temperature...")
         flag, min, max, outlier = self.checkGasTemp()
         if flag:
-            print("OK; Stable between {:.2f}°C and {:.2f}°C".format(min, max))
-            result.append(1)
+            report_data["GasTemp"] = f"OK; Stable between {min:.2f}°C and {max:.2f}°C."
+            self.result.append(1)
         else:
-            print(
-                "Abnormal; {:.2f}% data fall out the stable range between {:.2f} m/s and {:.2f} m/s".format(
-                    outlier, min, max
-                )
-            )
-            result.append(-1)
-        print(sep)
+            report_data[
+                "GasTemp"
+            ] = f"Abnormal; {outlier:.2f}% data fall out the stable range between {min:.2f}°C and {max:.2f}°C."
+            self.result.append(-1)
 
-        print("Platform Temperature: ")
-        flag, min, max, outlier = self.checkPlat()
-        if flag:
-            print("OK; Stable between {:.2f}°C and {:.2f}°C".format(min, max))
-            result.append(1)
-        else:
-            print(
-                "Abnormal; {:.2f}% data fall out the stable range between {:.2f} m/s and {:.2f} m/s".format(
-                    outlier, min, max
-                )
-            )
-            result.append(-1)
-        print(sep)
+        # print("Platform Temperature: ")
+        # flag, min, max, outlier = self.checkPlat()
+        # if flag:
+        #     print("OK; Stable between {:.2f}°C and {:.2f}°C".format(min, max))
+        #     self.result.append(1)
+        # else:
+        #     print(
+        #         "Abnormal; {:.2f}% data fall out the stable range between {:.2f} m/s and {:.2f} m/s".format(
+        #             outlier, min, max
+        #         )
+        #     )
+        #     self.result.append(-1)
+        #
 
-        print("Build Chamber Temperature: ")
+        print("Generating report for build chamber...")
         flag, min, max, outlier = self.checkChamber()
         if flag:
-            print("OK; Stable between {:.2f}°C and {:.2f}°C".format(min, max))
-            result.append(1)
+            report_data[
+                "BuildChamber"
+            ] = f"OK; Stable between {min:.2f}°C and {max:.2f}°C."
+            self.result.append(1)
         else:
-            print(
-                "Abnormal; {:.2f}% data fall out the stable range between {:.2f}°C and {:.2f}°C".format(
-                    outlier, min, max
-                )
-            )
-            result.append(-1)
-        print(sep)
+            report_data[
+                "BuildChamber"
+            ] = f"Abnormal; {outlier:.2f}% data fall out the stable range between {min:.2f}°C and {max:.2f}°C."
+            self.result.append(-1)
 
-        print("Optical Bench Temperature: ")
+        print("Generating report for optical bench temperature...")
         flag, min, max, outlier = self.checkOptical()
         if flag:
-            print("OK; Stable between {:.2f}°C and {:.2f}°C".format(min, max))
-            result.append(1)
+            report_data[
+                "OpticalBench"
+            ] = f"OK; Stable between {min:.2f}°C and {max:.2f}°C"
+            self.result.append(1)
         else:
-            print(
-                "Abnormal; {:.2f}% data fall out the stable range between {:.2f}°C and {:.2f}°C".format(
-                    outlier, min, max
-                )
-            )
-            result.append(-1)
-        print(sep)
+            report_data[
+                "OpticalBench"
+            ] = f"Abnormal; {outlier:.2f}% data fall out the stable range between {min:.2f}°C and {max:.2f}°C."
+            self.result.append(-1)
 
-        print("Collimator Temperature: ")
+        print("Generating report for collimator temperature...")
         flag, min, max, outlier = self.checkCollimator()
         if flag:
-            print("OK; Stable between {:.2f}°C and {:.2f}°C".format(min, max))
-            result.append(1)
+            report_data[
+                "Collimator"
+            ] = f"OK; Stable between {min:.2f}°C and {max:.2f}°C."
+            self.result.append(1)
         else:
-            print(
-                "Abnormal; {:.2f}% data fall out the stable range between {:.2f}°C and {:.2f}°C".format(
-                    outlier, min, max
-                )
-            )
-            result.append(-1)
+            report_data[
+                "Collimator"
+            ] = f"Abnormal; {outlier:.2f}% data fall out the stable range between {min:.2f}°C and {max:.2f}°C."
+            self.result.append(-1)
 
-        print(sep)
-        print("Result:")
-        alert = result.count(-1)
-        print("Number of Alerts = ", alert)
-        if "Gas pump power" in self.sensor.columns:
-            result1 = str(round(alert / 11, 2))
-            print("Level of Alert = ", result1)
-        else:
-            result1 = str(round(alert / 10, 2))
-            print("Level of Alert = ", result1)
+        report_data["NumAlerts"] = self.result.count(-1)
+        report_data["AlertLevel"] = str(round(report_data["NumAlerts"] / 9, 2))
+
+        return report_data
