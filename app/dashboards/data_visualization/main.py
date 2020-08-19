@@ -10,14 +10,14 @@ from dash.dependencies import Input, Output, State
 import dash_html_components as html
 import dash_core_components as dcc
 
-from plotly.io import to_image, write_image
-import plotly.graph_objects as go
+import plotly
 
 from .layout import html_layout
 from . import graphs
 from .utils import parse_data_sheet
 from . import constants as c
 from .report import Checker
+
 
 PDFKIT_CONFIG = pdfkit.configuration(
     wkhtmltopdf=os.path.join(os.getcwd(), "app", "static", "wkhtmltopdf.exe")
@@ -119,24 +119,35 @@ def init_callbacks(app):
             Output("download-btn", "className"),
         ],
         [Input("download-btn", "n_clicks")],
-        [
-            State("store", "data"),
-            State("main-graph", "figure"),
-            State("download-link", "href"),
-        ],
+        [State("store", "data"), State("download-link", "href"),],
     )
-    def make_image(n_clicks, data, figure, download_href):
+    def make_image(n_clicks, data, download_href):
         print("make_image()")
         if download_href:
             return (None, "Initialize Report Download", "btn btn-primary")
         else:
             # run the report generator by passing in the df
             df = pd.read_feather(data["filepath"])
-            df.set_index(["Time"])
+            df = df.set_index("Time")
             checker = Checker(df)
-            report_data = checker.generateReport()
+            r = checker.generateReport()
+
             # put the report data into the template
-            template = flask.render_template("report.jinja2")
+            template = flask.render_template(
+                "report.jinja2",
+                filename=data["filename"],
+                pressure=r["Pressure"],
+                filter_status=r["FilterStatus"],
+                gas_flow_speed=r["GasFlowSpeed"],
+                oxygen_1=r["Oxygen1"],
+                oxygen_2=r["Oxygen2"],
+                gas_temp=r["GasTemp"],
+                build_chamber=r["BuildChamber"],
+                optical_bench=r["OpticalBench"],
+                collimator=r["Collimator"],
+                num_alerts=r["NumAlerts"],
+                alert_level=r["AlertLevel"],
+            )
             pdfkit.from_string(
                 template,
                 f"{c.MEDIA_REPORT_PATH}/{data['filename']}.pdf",
@@ -241,7 +252,6 @@ def init_callbacks(app):
     def show_anomalies(value, figure, column_filters):
         print(f"show_anomalies(), checkbox value: {value}")
         if value:
-            print(figure["data"][0]["x"][:5])
             figure["layout"]["shapes"] = [
                 anomaly_region("2020-3-23T06:00:00", "2020-3-23T12:00:00", "#e41a1c")
             ]

@@ -21,14 +21,13 @@ def data_report():
 
 @app.route("/reports")
 def ml_report():
-    return render_template("reports.jinja2", title="Team Reports")
+    return render_template("personal_reports.jinja2", title="Team Reports")
 
 
 @app.route("/download/report/<path:path>")
 def download_reports(path):
     path = unquote(path)
     full_path = os.path.join("media", "reports", path)
-
     return send_file(full_path, as_attachment=True)
 
 
