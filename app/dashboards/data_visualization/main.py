@@ -2,16 +2,27 @@ import numpy as np
 import pandas as pd
 import os
 import datetime
+import flask
+import pdfkit
 
 import dash
 from dash.dependencies import Input, Output, State
 import dash_html_components as html
 import dash_core_components as dcc
 
+import plotly
+
 from .layout import html_layout
 from . import graphs
 from .utils import parse_data_sheet
 from . import constants as c
+from .report_generator import Checker
+from .anomaly_detection import detect_anomalies
+
+
+PDFKIT_CONFIG = pdfkit.configuration(
+    wkhtmltopdf=os.path.join(os.getcwd(), "app", "static", "wkhtmltopdf.exe")
+)
 
 
 def create_dashboard(server):
@@ -62,6 +73,19 @@ def create_layout():
                 options=[{"label": " Show Anomalies", "value": "ShowAnomalies"}],
                 className="text-center",
             ),
+            html.A(
+                dcc.Loading(
+                    html.Button(
+                        "Initialize Report Download",
+                        id="download-btn",
+                        className="btn btn-primary",
+                    ),
+                    type="dot",
+                ),
+                id="download-link",
+                href=None,
+                className="d-none",
+            ),
             html.Div(id="dashboard-component", className="text-center"),
             dcc.Store(id="store"),
         ]
@@ -71,7 +95,7 @@ def create_layout():
 def upload_history():
     try:
         upload_history_options = [
-            {"label": file[:-4], "value": file} for file in os.listdir(c.MEDIA_PATH)
+            {"label": file[:-4], "value": file} for file in os.listdir(c.MEDIA_DF_PATH)
         ]
 
         return html.Div(
@@ -90,6 +114,53 @@ def upload_history():
 
 def init_callbacks(app):
     @app.callback(
+        [
+            Output("download-link", "href"),
+            Output("download-btn", "children"),
+            Output("download-btn", "className"),
+        ],
+        [Input("download-btn", "n_clicks")],
+        [State("store", "data"), State("download-link", "href"),],
+    )
+    def make_image(n_clicks, data, download_href):
+        print("make_image()")
+        if download_href:
+            return (None, "Initialize Report Download", "btn btn-primary")
+        else:
+            # run the report generator by passing in the df
+            df = pd.read_feather(data["filepath"])
+            df = df.set_index("Time")
+            checker = Checker(df)
+            r = checker.generateReport()
+
+            # put the report data into the template
+            template = flask.render_template(
+                "report.jinja2",
+                filename=data["filename"],
+                pressure=r["Pressure"],
+                filter_status=r["FilterStatus"],
+                gas_flow_speed=r["GasFlowSpeed"],
+                oxygen_1=r["Oxygen1"],
+                oxygen_2=r["Oxygen2"],
+                gas_temp=r["GasTemp"],
+                build_chamber=r["BuildChamber"],
+                optical_bench=r["OpticalBench"],
+                collimator=r["Collimator"],
+                num_alerts=r["NumAlerts"],
+                alert_level=r["AlertLevel"],
+            )
+            pdfkit.from_string(
+                template,
+                f"{c.MEDIA_REPORT_PATH}/{data['filename']}.pdf",
+                configuration=PDFKIT_CONFIG,
+            )
+            return (
+                f"/download/report/{data['filename']}.pdf",
+                "Download Now",
+                "btn btn-success",
+            )
+
+    @app.callback(
         Output("store", "data"),
         [
             Input("upload-component", "contents"),
@@ -104,7 +175,7 @@ def init_callbacks(app):
                 print("Looking through past uploads...")
                 return {
                     "filename": history_filename[:-4],
-                    "filepath": f"{c.MEDIA_PATH}/{history_filename}",
+                    "filepath": f"{c.MEDIA_DF_PATH}/{history_filename}",
                     "valid_upload": True,
                 }
             elif "upload-component" in fired_input:
@@ -112,7 +183,7 @@ def init_callbacks(app):
                 if csv_filename:
                     if csv_filename[-4:] == ".csv":
                         filename = csv_filename[:-4]
-                        filepath = f"{c.MEDIA_PATH}/{filename}.ftr"
+                        filepath = f"{c.MEDIA_DF_PATH}/{filename}.ftr"
                         if os.path.exists(filepath):
                             print("Cache hit!")
                         else:
@@ -127,81 +198,90 @@ def init_callbacks(app):
         except:
             pass
 
-    # @app.callback(Output("info-component", "children"), [Input("store", "data")])
-    # def update_info(data):
-    #     print("Updating info...")
-    #     try:
-    #         if data["valid_upload"]:
-    #             df = pd.read_feather(data["filepath"])
-    #             return html.P(
-    #                 f"Successfully uploaded: {data['filename']} ♦ Machine Type: {df.loc[0, 'MachineType']} ♦ Number of Data Points: {df.loc[0, 'NumDataPoints']}",
-    #                 className="text-success pt-3",
-    #                 id="info-component",
-    #             )
-    #         else:
-    #             return html.P(
-    #                 children="The file you uploaded was either not a CSV file or does not have the expected column names of a SLM280 or SLM500 machine.",
-    #                 className="text-danger pt-3",
-    #                 id="info-component",
-    #             )
-    #     except:
-    #         pass
-
     @app.callback(
-        Output("dashboard-component", "children"),
-        [Input("store", "data"), Input("filter-dropdown", "value"),],
+        [
+            Output("dashboard-component", "children"),
+            Output("download-link", "className"),
+        ],
+        [Input("store", "data"), Input("filter-dropdown", "value")],
     )
     def update_dashboard(data, column_filters):
         print(f"update_dashboard, data: {data}, column_filters: {column_filters}")
         try:
+            download_btn_class = "row justify-content-center pt-3"
             if data["valid_upload"]:
                 column_filters += c.TEMP_COLUMNS
                 df = pd.read_feather(data["filepath"])[column_filters]
                 print("Success!")
-                return [
-                    html.P(
-                        f"Successfully uploaded: {data['filename']} ♦ Machine Type: {df.loc[0, 'MachineType']} ♦ Number of Data Points: {df.loc[0, 'NumDataPoints']}",
-                        className="text-success pt-3",
-                        id="info-component",
-                    ),
-                    dcc.Graph(
-                        id="main-graph",
-                        figure=graphs.main_graph(df),
-                        style={"height": "80%"},
-                    ),
-                ]
+                return (
+                    [
+                        html.P(
+                            f"Successfully uploaded: {data['filename']} ♦ Machine Type: {df.loc[0, 'MachineType']} ♦ Number of Data Points: {df.loc[0, 'NumDataPoints']}",
+                            className="text-success pt-2",
+                        ),
+                        dcc.Loading(
+                            dcc.Graph(
+                                id="main-graph",
+                                figure=graphs.main_graph(df),
+                                style={"height": "80%"},
+                            ),
+                            type="dot",
+                        ),
+                    ],
+                    download_btn_class,
+                )
             else:
-                return html.P(
-                    children="The file you uploaded was either not a CSV file or does not have the expected column names of a SLM280 or SLM500 machine.",
-                    className="text-danger pt-3",
-                    id="info-component",
+                return (
+                    html.P(
+                        children="The file you uploaded was either not a CSV file or does not have the expected column names of a SLM280 or SLM500 machine.",
+                        className="text-danger pt-2",
+                    ),
+                    f"{download_btn_class} d-none",
                 )
         except:
             pass
+        return (
+            None,
+            f"{download_btn_class} d-none",
+        )
 
     @app.callback(
         Output("main-graph", "figure"),
         [Input("anomaly-checkbox", "value")],
-        [State("main-graph", "figure")],
+        [State("main-graph", "figure"), State("filter-dropdown", "value")],
     )
-    def show_anomalies(value, figure):
+    def show_anomalies(value, figure, column_filters):
         print(f"show_anomalies(), checkbox value: {value}")
-        if value:
-            figure["layout"]["shapes"] = [
-                {
-                    "type": "rect",
-                    "xref": "Time",
-                    "yref": "paper",  # y-reference is assigned to the plot paper [0, 1]
-                    "x0": "2020-3-23T18:00:00",
-                    "y0": 0,
-                    "x1": "2020-3-24T06:00:00",
-                    "y1": 1,
-                    "fillcolor": "LightSalmon",
-                    "opacity": 0.5,
-                    "layer": "below",
-                    "line": {"width": 0},
-                }
-            ]
-        elif not value and "shapes" in figure["layout"]:
-            del figure["layout"]["shapes"]
+        if len(column_filters) == 1:
+            input_df = pd.DataFrame()
+            input_df["Time"] = figure["data"][0]["x"]
+            input_df[column_filters[0]] = figure["data"][0]["y"]
+            detect_anomalies(
+                input_df, column_filters[0], 11.5, 11.9,
+            )
+            # detect_anomalies()
+            if value:
+                figure["layout"]["shapes"] = [
+                    anomaly_region(
+                        "2020-3-23T06:00:00", "2020-3-23T12:00:00", "#e41a1c"
+                    )
+                ]
+            elif not value and "shapes" in figure["layout"]:
+                del figure["layout"]["shapes"]
         return figure
+
+
+def anomaly_region(start, end, color):
+    return {
+        "type": "rect",
+        "xref": "Time",
+        "yref": "paper",  # y-reference is assigned to the plot paper [0, 1]
+        "x0": start,
+        "y0": 0,
+        "x1": end,
+        "y1": 1,
+        "fillcolor": color,
+        "opacity": 0.3,
+        "layer": "below",
+        "line": {"width": 0},
+    }
