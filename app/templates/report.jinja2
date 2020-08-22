@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+</head>
+
+<body>
+  <div class="container-fluid text-center">
+    <h1>Report</h1>
+    <p>Number of Alerts: {{ num_alerts }} | Alert Level: {{ alert_level }}</p>
+    <h4>Pressure</h4>
+    {% for sentence in pressure %}
+      <p>{{ sentence }}</p>
+    {% endfor %}
+    <h4>Filter</h4>
+    <p>{{ filter_status }}  
+    <h4>Gas Flow Speed</h4>
+    <p>{{ gas_flow_speed }}</p>
+    <h4>Oxygen 1</h4>
+    <p>{{ oxygen_1 }}</p>
+    <h4>Oxygen 2</h4>
+    <p>{{ oxygen_2 }}</p>
+    <h4>Gas Temperature</h4>
+    <p>{{ gas_temp }}</p>
+    <h4>Build Chamber Temperature</h4>
+    <p>{{ build_chamber }}</p>
+    <h4>Optical Bench Temperature</h4>
+    <p>{{ optical_bench }}</p>
+    <h4>Collimator Temperature</h4>
+    <p>{{ collimator }}</p>
+  </div>
+</body>
+
+</html>

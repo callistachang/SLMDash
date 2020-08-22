@@ -1,4 +1,6 @@
-MEDIA_PATH = "./app/media"
+MEDIA_DF_PATH = "./app/media/dataframes"
+
+MEDIA_REPORT_PATH = "./app/media/reports"
 
 SLM280_COLUMNS = [
     "Time",

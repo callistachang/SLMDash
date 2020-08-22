@@ -46,8 +46,8 @@ def parse_data_sheet(content, filename):
         df["MachineType"] = machine_type
         df["NumDataPoints"] = len(df)
 
-        # Cut the number of data points by a factor of 30k
-        step = len(df) // 30000
+        # Cut the number of data points by a factor of 25k
+        step = len(df) // 25000
         df = df.iloc[::step].reset_index()
         return df
 

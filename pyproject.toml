@@ -12,6 +12,13 @@ pandas = "^1.0.5"
 python-dotenv = "^0.14.0"
 flask_assets = "^2.0"
 pyarrow = "^1.0.0"
+statsmodels = "^0.11.1"
+sklearn = "^0.0"
+keras = "^2.4.3"
+kaleido = "^0.0.3"
+psutil = "^5.7.2"
+requests = "^2.24.0"
+pdfkit = "^0.6.1"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"
