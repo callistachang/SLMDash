@@ -65,12 +65,14 @@ def create_layout():
                 id="filter-dropdown",
                 options=c.DROPDOWN_OPTIONS,
                 multi=True,
-                value=["Pressure"],
+                value=["Pressure", "Oxygen1"],
                 className="mx-auto pt-2 w-50",
             ),
             dcc.Checklist(
                 id="anomaly-checkbox",
-                options=[{"label": " Show Anomalies", "value": "ShowAnomalies"}],
+                options=[
+                    {"label": " Show Anomalies (1 Column)", "value": "ShowAnomalies",}
+                ],
                 className="text-center",
             ),
             html.A(
@@ -135,7 +137,7 @@ def init_callbacks(app):
 
             # put the report data into the template
             template = flask.render_template(
-                "report.jinja2",
+                "report_template.jinja2",
                 filename=data["filename"],
                 pressure=r["Pressure"],
                 filter_status=r["FilterStatus"],

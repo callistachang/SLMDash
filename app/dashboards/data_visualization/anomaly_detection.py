@@ -1,10 +1,6 @@
 import numpy as np
 import pandas as pd
 
-import plotly.graph_objs as go
-from plotly.offline import init_notebook_mode, plot, iplot
-from plotly.subplots import make_subplots
-
 from sklearn.ensemble import IsolationForest
 
 
