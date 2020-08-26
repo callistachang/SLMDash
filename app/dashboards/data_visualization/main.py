@@ -14,10 +14,11 @@ import plotly
 
 from .layout import html_layout
 from . import graphs
-from .utils import parse_data_sheet
+from .utils import parse_data_sheet, read_log
 from . import constants as c
 from .report_generator import Checker
 from .anomaly_detection import detect_anomalies
+from .graphs import COLOR_MAPPER
 
 
 PDFKIT_CONFIG = pdfkit.configuration(
@@ -58,6 +59,17 @@ def create_layout():
                     ),
                     html.Span("OR", className="mx-3 pt-2 font-weight-bold"),
                     upload_history(),
+                    html.Span("AND", className="mx-3 pt-2 font-weight-bold"),
+                    dcc.Upload(
+                        "Upload Log File",
+                        id="upload-log",
+                        className="px-5 text-center rounded",
+                        style={
+                            "lineHeight": "36px",
+                            "border": "1px dashed",
+                            "cursor": "pointer",
+                        },
+                    ),
                 ],
                 className="d-flex justify-content-center",
             ),
@@ -71,7 +83,10 @@ def create_layout():
             dcc.Checklist(
                 id="anomaly-checkbox",
                 options=[
-                    {"label": " Show Anomalies (1 Column)", "value": "ShowAnomalies",}
+                    {
+                        "label": " Show Anomalies (only for Pressure, GasFlowSpeed, Oxygen1 and Oxygen2)",
+                        "value": "ShowAnomalies",
+                    }
                 ],
                 className="text-center",
             ),
@@ -89,6 +104,7 @@ def create_layout():
                 className="d-none",
             ),
             html.Div(id="dashboard-component", className="text-center"),
+            html.Div(id="placeholder"),
             dcc.Store(id="store"),
         ]
     )
@@ -205,43 +221,82 @@ def init_callbacks(app):
             Output("dashboard-component", "children"),
             Output("download-link", "className"),
         ],
-        [Input("store", "data"), Input("filter-dropdown", "value")],
+        [
+            Input("store", "data"),
+            Input("filter-dropdown", "value"),
+            Input("upload-log", "contents"),
+            Input("upload-log", "filename"),
+        ],
     )
-    def update_dashboard(data, column_filters):
+    def update_dashboard(data, column_filters, log_contents, log_filename):
         print(f"update_dashboard, data: {data}, column_filters: {column_filters}")
         try:
             download_btn_class = "row justify-content-center pt-3"
-            if data["valid_upload"]:
-                column_filters += c.TEMP_COLUMNS
-                df = pd.read_feather(data["filepath"])[column_filters]
-                print("Success!")
-                return (
-                    [
-                        html.P(
-                            f"Successfully uploaded: {data['filename']} ♦ Machine Type: {df.loc[0, 'MachineType']} ♦ Number of Data Points: {df.loc[0, 'NumDataPoints']}",
-                            className="text-success pt-2",
-                        ),
-                        dcc.Loading(
-                            dcc.Graph(
-                                id="main-graph",
-                                figure=graphs.main_graph(df),
-                                style={"height": "80%"},
+            fired_input = dash.callback_context.triggered[0]["prop_id"]
+            if "upload-log" in fired_input:
+                print("sup")
+                print(log_contents[:20], log_filename, data)
+                if data:
+                    start, end = read_log(log_contents, log_filename)
+                    print(start, end)
+                    column_filters += c.TEMP_COLUMNS
+                    df = pd.read_feather(data["filepath"])
+                    df = df[(df["Time"] >= start) & (df["Time"] <= end)]
+                    cut_df = df[column_filters]
+                    if os.path.exists(os.path.join(os.getcwd(), data["filepath"])):
+                        os.remove(os.path.join(os.getcwd(), data["filepath"]))
+                    df.reset_index().to_feather(data["filepath"])
+                    return (
+                        [
+                            html.P(
+                                f"Successfully uploaded: {data['filename']} ♦ Machine Type: {df.loc[0, 'MachineType']} ♦ Number of Data Points: {df.loc[0, 'NumDataPoints']}",
+                                className="text-success pt-2",
                             ),
-                            type="dot",
-                        ),
-                    ],
-                    download_btn_class,
-                )
+                            dcc.Loading(
+                                dcc.Graph(
+                                    id="main-graph",
+                                    figure=graphs.main_graph(cut_df),
+                                    style={"height": "80%"},
+                                ),
+                                type="dot",
+                            ),
+                        ],
+                        f"{download_btn_class}",
+                    )
+
             else:
-                return (
-                    html.P(
-                        children="The file you uploaded was either not a CSV file or does not have the expected column names of a SLM280 or SLM500 machine.",
-                        className="text-danger pt-2",
-                    ),
-                    f"{download_btn_class} d-none",
-                )
-        except:
-            pass
+                download_btn_class = "row justify-content-center pt-3"
+                if data["valid_upload"]:
+                    column_filters += c.TEMP_COLUMNS
+                    df = pd.read_feather(data["filepath"])[column_filters]
+                    print("Success!")
+                    return (
+                        [
+                            html.P(
+                                f"Successfully uploaded: {data['filename']} ♦ Machine Type: {df.loc[0, 'MachineType']} ♦ Number of Data Points: {df.loc[0, 'NumDataPoints']}",
+                                className="text-success pt-2",
+                            ),
+                            dcc.Loading(
+                                dcc.Graph(
+                                    id="main-graph",
+                                    figure=graphs.main_graph(df),
+                                    style={"height": "80%"},
+                                ),
+                                type="dot",
+                            ),
+                        ],
+                        download_btn_class,
+                    )
+                else:
+                    return (
+                        html.P(
+                            children="The file you uploaded was either not a CSV file or does not have the expected column names of a SLM280 or SLM500 machine.",
+                            className="text-danger pt-2",
+                        ),
+                        f"{download_btn_class} d-none",
+                    )
+        except Exception as e:
+            print(e)
         return (
             None,
             f"{download_btn_class} d-none",
@@ -253,23 +308,35 @@ def init_callbacks(app):
         [State("main-graph", "figure"), State("filter-dropdown", "value")],
     )
     def show_anomalies(value, figure, column_filters):
-        print(f"show_anomalies(), checkbox value: {value}")
-        if len(column_filters) == 1:
+        print(f"show_anomalies()")
+        if value and len(column_filters) == 1:
             input_df = pd.DataFrame()
+            col_1 = column_filters[0]
             input_df["Time"] = figure["data"][0]["x"]
-            input_df[column_filters[0]] = figure["data"][0]["y"]
-            detect_anomalies(
-                input_df, column_filters[0], 11.5, 11.9,
+            input_df[col_1] = figure["data"][0]["y"]
+            anomaly_times = detect_anomalies(
+                input_df,
+                col_1,
+                c.ANOMALY_THRESHOLDS[col_1][0],
+                c.ANOMALY_THRESHOLDS[col_1][1],
             )
-            # detect_anomalies()
-            if value:
-                figure["layout"]["shapes"] = [
-                    anomaly_region(
-                        "2020-3-23T06:00:00", "2020-3-23T12:00:00", "#e41a1c"
-                    )
-                ]
-            elif not value and "shapes" in figure["layout"]:
-                del figure["layout"]["shapes"]
+            # print(anomaly_times)
+            anomaly_dict = {}  # start index : end index
+            track_i = anomaly_times.index[0]
+            for i in anomaly_times.index:
+                # keep the key
+                if i < (track_i + 50):
+                    anomaly_dict[track_i] = i
+                # move to next time period
+                else:
+                    anomaly_dict[i] = i
+                    track_i = i
+            figure["layout"]["shapes"] = [
+                anomaly_region(anomaly_times[k], anomaly_times[v], COLOR_MAPPER[col_1],)
+                for k, v in anomaly_dict.items()
+            ]
+        elif not value and "shapes" in figure["layout"]:
+            del figure["layout"]["shapes"]
         return figure
 
 
@@ -283,7 +350,7 @@ def anomaly_region(start, end, color):
         "x1": end,
         "y1": 1,
         "fillcolor": color,
-        "opacity": 0.3,
+        "opacity": 0.5,
         "layer": "below",
         "line": {"width": 0},
     }

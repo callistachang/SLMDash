@@ -17,15 +17,6 @@ COLUMNS = COLUMNS_TO_KEEP[:]
 COLUMNS.remove("Time")
 COLOR_MAPPER = dict(zip(COLUMNS, COLORS))
 
-# 9 colors
-colors = [
-    "#577590",
-    "#E5A9A9",
-    "#F3CA40",
-    "#00BD9D",
-    "#54DEFD",
-]
-
 
 def main_graph(df):
     print("main_graph()")

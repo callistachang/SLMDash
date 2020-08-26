@@ -2,6 +2,13 @@ MEDIA_DF_PATH = "./app/media/dataframes"
 
 MEDIA_REPORT_PATH = "./app/media/reports"
 
+ANOMALY_THRESHOLDS = {
+    "Pressure": [11.5, 12.5],
+    "GasFlowSpeed": [19.5, 20.5],
+    "Oxygen1": [-0.1, 0.1],
+    "Oxygen2": [-0.1, 0.1],
+}
+
 SLM280_COLUMNS = [
     "Time",
     "Platform",

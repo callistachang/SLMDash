@@ -10,6 +10,22 @@ import dash_html_components as html
 from . import constants as c
 
 
+def read_log(content, filename):
+    sep = "---------------------------------------------"
+    start, end = None, None
+    _, content_string = content.split(",")
+    decoded_data = base64.b64decode(content_string)
+    i = 0
+    for line in io.StringIO(decoded_data.decode("utf-8")):
+        if not line:
+            break
+        elif start is None and sep in line:
+            start = pd.to_datetime(line.split(",")[0])
+        elif sep in line:
+            end = pd.to_datetime(line.split(",")[0])
+    return start, end
+
+
 def parse_data_sheet(content, filename):
     """Convert the CSV file uploaded from the data dashboard to a Pandas DataFrame.
 
