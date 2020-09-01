@@ -3,6 +3,7 @@ from flask import current_app as app
 import os
 from urllib.parse import unquote
 from werkzeug.utils import secure_filename
+from app.dashboards.image_recognition import find_defects
 
 
 @app.route("/")
@@ -29,14 +30,20 @@ def ml_report():
 
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
+    path = ""
     if request.method == "POST":
         file = request.files["file"]
         if file:
             filename = secure_filename(file.filename)
-            file.save(os.path.join("app", "media", "images", filename))
-
-    return """lol"""
-    # return render_template("upload.html", data=a)
+            print(filename)
+            dirname = os.path.join("app", "media", "images")
+            filepath = os.path.join(dirname, filename)
+            if not os.path.exists(dirname):
+                os.makedirs(dirname)
+            file.save(filepath)
+            path = find_defects(filename)
+            path = f"images/{path}"
+    return render_template("image_recognition_page.jinja2", path=path)
 
 
 @app.route("/download/report/<path:path>")

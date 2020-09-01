@@ -2,10 +2,17 @@
 
 {% block content %}
 
-<h1>Upload new File</h1>
+<h1>Image Recognition</h1>
+<p>Choose a file and click upload. The result image will be the image with errors circled.</p>
 <form method="post" enctype="multipart/form-data" action="/upload">
     <input type="file" name="file">
+    <br /><br />
     <input type="submit" value="Upload">
+    <br /><br />
 </form>
+
+{% if path %}
+    <img src="{{url_for('static', filename=path)}}" 
+{% endif %}
 
 {% endblock %}

@@ -21,7 +21,6 @@ COLOR_MAPPER = dict(zip(COLUMNS, COLORS))
 def main_graph(df):
     print("main_graph()")
     columns = [col for col in df.columns if not col in TEMP_COLUMNS]
-    print(COLOR_MAPPER[columns[0]])
 
     data = [
         {
