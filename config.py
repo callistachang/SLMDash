@@ -15,4 +15,5 @@ class Config:
     COMPRESSOR_DEBUG = environ.get("COMPRESSOR_DEBUG")
 
     STATIC_FOLDER = "static"
+    MEDIA_FOLDER = "media"
     TEMPLATES_FOLDER = "templates"

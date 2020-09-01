@@ -187,6 +187,7 @@ def init_callbacks(app):
         ],
     )
     def upload(csv_contents, csv_filename, history_filename):
+        print("upload()")
         try:
             fired_input = dash.callback_context.triggered[0]["prop_id"]
             if "history-component" in fired_input:
@@ -206,6 +207,8 @@ def init_callbacks(app):
                             print("Cache hit!")
                         else:
                             df = parse_data_sheet(csv_contents, csv_filename)
+                            if os.path.exists(os.path.join(os.getcwd(), filepath)):
+                                os.remove(os.path.join(os.getcwd(), filepath))
                             df.to_feather(filepath)
                         return {
                             "filename": filename,
@@ -242,10 +245,11 @@ def init_callbacks(app):
                     column_filters += c.TEMP_COLUMNS
                     df = pd.read_feather(data["filepath"])
                     df = df[(df["Time"] >= start) & (df["Time"] <= end)]
-                    cut_df = df[column_filters]
                     if os.path.exists(os.path.join(os.getcwd(), data["filepath"])):
                         os.remove(os.path.join(os.getcwd(), data["filepath"]))
                     df.reset_index().to_feather(data["filepath"])
+                    cut_df = df[column_filters]
+                    print(cut_df.head())
                     return (
                         [
                             html.P(
@@ -261,7 +265,7 @@ def init_callbacks(app):
                                 type="dot",
                             ),
                         ],
-                        f"{download_btn_class}",
+                        download_btn_class,
                     )
 
             else:
