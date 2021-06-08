@@ -19,7 +19,7 @@ requests = "^2.24.0"
 pdfkit = "^0.6.1"
 opencv-python = "^4.4.0"
 scikit-image = "^0.17.2"
-pillow = "^7.2.0"
+pillow = "^8.2.0"
 imutils = "^0.5.3"
 
 [tool.poetry.dev-dependencies]
