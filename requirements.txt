@@ -49,4 +49,4 @@ threadpoolctl==2.1.0
 tifffile==2020.8.25
 urllib3==1.25.10
 webassets==2.0
-werkzeug==1.0.1
+werkzeug==2.2.3
